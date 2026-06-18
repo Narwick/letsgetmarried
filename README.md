@@ -66,10 +66,13 @@ Acesse `http://localhost:3000`.
 
 ## 5. Configurar a AbacatePay
 1. Crie a API key e coloque em `ABACATEPAY_API_KEY`.
-2. Em **Webhooks**, cadastre a URL:
+2. Crie um **Produto** (a assinatura anual) no painel e copie o id (`prod_...`) para
+   `ABACATEPAY_PRODUCT_ID`. A v2 cobra por produto pré-cadastrado.
+3. Em **Webhooks**, cadastre a URL:
    `https://SEU_DOMINIO/api/webhooks/abacatepay?webhookSecret=SEU_SEGREDO`
-   (o `SEU_SEGREDO` deve ser igual ao `ABACATEPAY_WEBHOOK_SECRET`).
-3. Use o `devMode` da AbacatePay para testar antes da produção.
+   (o `SEU_SEGREDO` deve ser igual ao `ABACATEPAY_WEBHOOK_SECRET`) e selecione o
+   evento **`checkout.completed`**.
+4. Use o `devMode` da AbacatePay para testar antes da produção.
 
 ## 6. Deploy na Vercel
 1. Suba o repositório no GitHub e importe na Vercel.
