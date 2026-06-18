@@ -1,0 +1,49 @@
+export type WeddingStatus = "draft" | "published" | "expired";
+
+export type PixKeyType = "cpf" | "cnpj" | "email" | "phone" | "random";
+
+export interface Wedding {
+  id: string;
+  owner_id: string;
+  slug: string;
+  couple_names: string | null;
+  story: string | null;
+  event_date: string | null; // ISO date
+  event_location: string | null;
+  event_details: string | null;
+  cover_photo_url: string | null;
+  theme: string;
+  pix_key: string | null;
+  pix_key_type: PixKeyType | null;
+  pix_recipient_name: string | null;
+  pix_city: string | null;
+  status: WeddingStatus;
+  published_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Gift {
+  id: string;
+  wedding_id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  suggested_amount: number | null; // em centavos
+  is_honeymoon_fund: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
+export type PaymentStatus = "pending" | "paid" | "failed";
+
+export interface Payment {
+  id: string;
+  wedding_id: string;
+  abacatepay_billing_id: string | null;
+  amount: number; // em centavos
+  status: PaymentStatus;
+  paid_at: string | null;
+  created_at: string;
+}
