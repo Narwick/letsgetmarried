@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       productName: "Assinatura anual — site de casamento",
       returnUrl: `${SITE_URL}/painel`,
       completionUrl: `${SITE_URL}/painel?pago=1`,
-      customerEmail: user.email ?? undefined,
+      // O pagador preenche os próprios dados na tela da AbacatePay.
     });
 
     // Registra a cobrança pendente (idempotência do webhook usa esse id).
