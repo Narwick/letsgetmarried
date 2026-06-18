@@ -1,22 +1,26 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { extractCheckoutId, extractExternalId } from "@/lib/abacatepay";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
-/** Publica o site por 1 ano. */
+/** Publica o site por 1 ano e invalida o cache da página pública. */
 async function publishWedding(admin: Admin, weddingId: string) {
   const now = new Date();
   const expiresAt = new Date(now);
   expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-  await admin
+  const { data } = await admin
     .from("weddings")
     .update({
       status: "published",
       published_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
     })
-    .eq("id", weddingId);
+    .eq("id", weddingId)
+    .select("slug")
+    .maybeSingle();
+  if (data?.slug) revalidatePath(`/${data.slug}`);
 }
 
 /**

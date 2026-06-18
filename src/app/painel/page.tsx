@@ -33,13 +33,25 @@ export default async function PainelHome() {
 
       <section className="rounded-2xl border border-border bg-surface p-5">
         <p className="text-sm text-muted">Endereço do site</p>
-        <div className="mt-1 flex items-center gap-3">
-          <Link href={`/${wedding.slug}`} className="font-medium text-accent hover:underline">
-            {publicUrl}
+        <p className="mt-1 font-medium text-foreground">{publicUrl}</p>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <Link
+            href="/preview"
+            className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:border-accent"
+          >
+            Pré-visualizar
           </Link>
+          {isLive && (
+            <Link
+              href={`/${wedding.slug}`}
+              className="rounded-full border border-border px-4 py-2 text-sm font-medium text-accent hover:border-accent"
+            >
+              Abrir site publicado ↗
+            </Link>
+          )}
         </div>
         {isLive && wedding.expires_at && (
-          <p className="mt-2 text-sm text-muted">
+          <p className="mt-3 text-sm text-muted">
             Ativo até {new Date(wedding.expires_at).toLocaleDateString("pt-BR")}.
           </p>
         )}
