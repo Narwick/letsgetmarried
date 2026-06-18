@@ -13,6 +13,7 @@ export interface Wedding {
   event_details: string | null;
   cover_photo_url: string | null;
   theme: string;
+  custom_accent: string | null;
   pix_key: string | null;
   pix_key_type: PixKeyType | null;
   pix_recipient_name: string | null;

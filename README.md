@@ -24,6 +24,22 @@ público por 1 ano em `seudominio.com/nome-do-casal`.
    `http://localhost:3000/auth/callback` (e a de produção depois).
 5. Copie em **Project Settings → API**: a URL, a `anon key` e a `service_role key`.
 
+### E-mail (SMTP via Resend)
+O serviço de e-mail embutido do Supabase tem limite baixíssimo (~2–4/hora) e causa
+"email rate limit exceeded". Configure um SMTP próprio:
+
+1. Crie conta no [Resend](https://resend.com). **Em modo de teste (sem domínio
+   verificado), só entrega e-mails para o endereço dono da conta** — então use o mesmo
+   e-mail com que vai logar no app.
+2. **API Keys → Create API Key** (Sending access); copie a chave `re_...`.
+3. No Supabase: **Authentication → Emails → SMTP Settings → Enable Custom SMTP**:
+   - Sender email: `onboarding@resend.dev` (teste) ou `nao-responda@seudominio.com` (prod)
+   - Sender name: `Nosso Casamento`
+   - Host: `smtp.resend.com` · Port: `587` · Username: `resend` · Password: a API key
+4. **Authentication → Rate Limits**: suba "emails per hour".
+5. **Produção:** em **Resend → Domains**, adicione e verifique seu domínio (registros
+   DNS SPF/DKIM) para enviar a qualquer convidado, de um remetente do seu domínio.
+
 ## 3. Variáveis de ambiente
 Copie `.env.local.example` para `.env.local` e preencha:
 

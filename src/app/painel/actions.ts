@@ -40,22 +40,39 @@ export async function getOrCreateWedding() {
   return created;
 }
 
-/** Salva o tema (paleta) escolhido para o site. */
-export async function saveTheme(weddingId: string, theme: string) {
+/** Revalida a página pública do casal (busca o slug e limpa o cache da rota). */
+async function revalidateSite(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  weddingId: string,
+) {
+  const { data } = await supabase
+    .from("weddings")
+    .select("slug")
+    .eq("id", weddingId)
+    .maybeSingle();
+  if (data?.slug) revalidatePath(`/${data.slug}`);
+}
+
+/** Salva o tema (paleta) escolhido para o site. Aceita preset ou cor custom. */
+export async function saveTheme(weddingId: string, theme: string, customAccent?: string | null) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const payload: { theme: string; custom_accent?: string | null } = { theme };
+  if (theme === "custom") payload.custom_accent = customAccent ?? null;
+
   const { error } = await supabase
     .from("weddings")
-    .update({ theme })
+    .update(payload)
     .eq("id", weddingId)
     .eq("owner_id", user.id);
 
   if (error) return { error: error.message };
   revalidatePath("/painel/editar");
+  await revalidateSite(supabase, weddingId);
   return { ok: true };
 }
 
@@ -75,6 +92,7 @@ export async function saveCoverPhoto(weddingId: string, url: string | null) {
 
   if (error) return { error: error.message };
   revalidatePath("/painel/editar");
+  await revalidateSite(supabase, weddingId);
   return { ok: true };
 }
 
@@ -124,6 +142,7 @@ export async function saveWedding(formData: FormData) {
   }
 
   revalidatePath("/painel/editar");
+  revalidatePath(`/${slug}`);
   return { ok: true };
 }
 

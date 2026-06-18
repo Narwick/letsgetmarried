@@ -18,7 +18,11 @@ export default async function EditarPage() {
             Escolha as cores que combinam com o seu casamento. Salva automaticamente.
           </p>
         </div>
-        <ThemePicker weddingId={wedding.id} initialTheme={wedding.theme || DEFAULT_THEME} />
+        <ThemePicker
+          weddingId={wedding.id}
+          initialTheme={wedding.theme || DEFAULT_THEME}
+          initialCustomAccent={wedding.custom_accent}
+        />
       </section>
 
       <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">

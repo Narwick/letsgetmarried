@@ -114,14 +114,75 @@ export const THEMES: Theme[] = [
 ];
 
 export const DEFAULT_THEME = "sage";
+export const CUSTOM_THEME = "custom";
 
 export function getTheme(id: string | null | undefined): Theme {
   return THEMES.find((t) => t.id === id) ?? THEMES[0];
 }
 
+/* ── Utilitários de cor para o tema personalizado ─────────────────────── */
+function hexToRgb(hex: string): [number, number, number] {
+  let h = hex.replace("#", "").trim();
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  const n = parseInt(h, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const clamp = (n: number) => Math.max(0, Math.min(255, Math.round(n)));
+function rgbToHex(r: number, g: number, b: number): string {
+  return "#" + [r, g, b].map((c) => clamp(c).toString(16).padStart(2, "0")).join("");
+}
+/** Escurece a cor por uma fração (0–1). */
+function darken(hex: string, f: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbToHex(r * (1 - f), g * (1 - f), b * (1 - f));
+}
+/** Mistura a cor com branco por uma fração (0–1) — versão "suave". */
+function mixWhite(hex: string, f: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbToHex(r + (255 - r) * f, g + (255 - g) * f, b + (255 - b) * f);
+}
+
+const HEX_RE = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+export function isValidHex(hex: string | null | undefined): boolean {
+  return !!hex && HEX_RE.test(hex.trim());
+}
+
+/** Monta um tema com base neutra (creme) e a cor de destaque escolhida. */
+export function buildCustomTheme(accent: string | null | undefined): Theme {
+  const safe = isValidHex(accent) ? accent!.trim() : THEMES[0].vars.accent;
+  const normalized = safe.startsWith("#") ? safe : `#${safe}`;
+  return {
+    id: CUSTOM_THEME,
+    label: "Personalizada",
+    description: "Sua cor",
+    vars: {
+      background: "#faf8f4",
+      surface: "#ffffff",
+      foreground: "#2b2b28",
+      muted: "#6f6f68",
+      border: "#e7e3db",
+      accent: normalized,
+      accentHover: darken(normalized, 0.15),
+      accentSoft: mixWhite(normalized, 0.85),
+    },
+  };
+}
+
+/** Resolve as variáveis do tema considerando preset OU cor personalizada. */
+export function resolveThemeVars(
+  themeId: string | null | undefined,
+  customAccent: string | null | undefined,
+): Theme["vars"] {
+  if (themeId === CUSTOM_THEME) return buildCustomTheme(customAccent).vars;
+  return getTheme(themeId).vars;
+}
+
 /** Variáveis CSS para aplicar inline no wrapper do site público. */
-export function themeStyle(id: string | null | undefined): CSSProperties {
-  const v = getTheme(id).vars;
+export function themeStyle(
+  id: string | null | undefined,
+  customAccent?: string | null,
+): CSSProperties {
+  const v = resolveThemeVars(id, customAccent);
   return {
     "--background": v.background,
     "--surface": v.surface,

@@ -103,7 +103,10 @@ export default async function PublicSite({
   const eventDate = wedding.event_date ? new Date(wedding.event_date) : null;
 
   return (
-    <div className="bg-background text-foreground" style={themeStyle(wedding.theme)}>
+    <div
+      className="bg-background text-foreground"
+      style={themeStyle(wedding.theme, wedding.custom_accent)}
+    >
       {isPreview && (
         <div className="bg-amber-500 px-4 py-2 text-center text-sm font-medium text-white">
           Pré-visualização (rascunho) — só você vê esta página. Publique no painel para
