@@ -16,7 +16,7 @@ const body = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Nosso Casamento — crie o site do seu casamento",
+  title: "letsgetmarried — crie o site do seu casamento",
   description:
     "Monte o site do seu casamento: história, save the date, lista de presentes e doação para a lua de mel.",
 };

@@ -1,4 +1,4 @@
-# Nosso Casamento — SaaS construtor de site de casamento
+# letsgetmarried — SaaS construtor de site de casamento
 
 SaaS onde noivos montam um site (história, save the date, infos, lista de presentes e
 fundo de lua de mel) e pagam uma **assinatura anual via PIX (AbacatePay)** para deixá-lo

@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
-      <p className="mb-4 text-sm uppercase tracking-[0.3em] text-accent">Nosso Casamento</p>
+      <p className="mb-4 text-sm uppercase tracking-[0.3em] text-accent">letsgetmarried</p>
       <h1 className="max-w-3xl font-serif text-5xl font-medium leading-tight text-foreground sm:text-6xl">
         O site do seu casamento, do jeito que vocês sonharam
       </h1>

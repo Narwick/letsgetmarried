@@ -12,7 +12,7 @@ export default function PainelLayout({
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
           <nav className="flex items-center gap-5 text-sm">
             <Link href="/painel" className="font-serif text-lg text-foreground">
-              Nosso Casamento
+              letsgetmarried
             </Link>
             <Link href="/painel/editar" className="text-muted transition hover:text-accent">
               Editar site
