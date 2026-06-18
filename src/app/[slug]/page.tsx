@@ -187,16 +187,24 @@ export default async function PublicSite({
           </div>
 
           {timeline.length > 0 ? (
-            <ol className="relative mx-auto max-w-2xl border-l border-border pl-8">
-              {timeline.map((h, i) => (
-                <li key={i} className="relative mb-10 last:mb-0">
-                  <span className="absolute -left-[33px] top-1 grid h-4 w-4 place-items-center rounded-full border-2 border-accent bg-background" />
-                  <span className="font-serif text-2xl italic text-accent">{h.ano}</span>
-                  {h.titulo && <h3 className="mt-1 font-serif text-2xl text-foreground">{h.titulo}</h3>}
-                  {h.texto && <p className="mt-2 leading-relaxed text-muted">{h.texto}</p>}
-                </li>
-              ))}
-            </ol>
+            <div className="relative mx-auto max-w-3xl">
+              <span className="absolute left-4 top-0 h-full w-px -translate-x-1/2 bg-border sm:left-1/2" />
+              <div className="space-y-10">
+                {timeline.map((h, i) => {
+                  const left = i % 2 === 0;
+                  return (
+                    <div key={i} className="relative pl-12 sm:grid sm:grid-cols-2 sm:gap-12 sm:pl-0">
+                      <span className="absolute left-4 top-1.5 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-accent bg-background sm:left-1/2" />
+                      <div className={left ? "sm:col-start-1 sm:pr-12 sm:text-right" : "sm:col-start-2 sm:pl-12 sm:text-left"}>
+                        <span className="font-serif text-2xl italic text-accent">{h.ano}</span>
+                        {h.titulo && <h3 className="mt-1 font-serif text-2xl text-foreground">{h.titulo}</h3>}
+                        {h.texto && <p className="mt-2 leading-relaxed text-muted">{h.texto}</p>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           ) : (
             <p className="mx-auto max-w-2xl whitespace-pre-line text-center leading-relaxed text-muted">
               {wedding.story}
@@ -354,7 +362,11 @@ function GiftGroup({
       <p className="mb-6 text-center text-[0.74rem] uppercase tracking-[0.28em] text-[var(--ink-accent)]">{title}</p>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {gifts.map((g) => (
-          <div key={g.id} className="rounded-xl border p-5 text-center" style={{ borderColor: "var(--ink-soft)", background: "color-mix(in srgb, var(--on-ink) 4%, transparent)" }}>
+          <div key={g.id} className="overflow-hidden rounded-xl border p-5 text-center" style={{ borderColor: "var(--ink-soft)", background: "color-mix(in srgb, var(--on-ink) 4%, transparent)" }}>
+            {g.image_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={g.image_url} alt={g.title} className="mb-4 h-36 w-full rounded-lg object-cover" />
+            )}
             <h4 className="font-serif text-xl text-[var(--on-ink)]">{g.title}</h4>
             {g.description && <p className="mt-1 text-sm text-[var(--on-ink-soft)]">{g.description}</p>}
             <p className="mt-1 mb-4 text-[var(--ink-accent)]">{brl(g.suggested_amount)}</p>

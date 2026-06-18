@@ -232,12 +232,14 @@ export async function addGift(formData: FormData) {
     wedding_id: weddingId,
     title: str(formData, "title") || "Presente",
     description: str(formData, "description"),
+    image_url: str(formData, "image_url"),
     is_honeymoon_fund: formData.get("is_honeymoon_fund") === "on",
     suggested_amount: amountRaw ? Math.round(parseFloat(amountRaw) * 100) : null,
   });
 
   if (error) return { error: error.message };
   revalidatePath("/painel/presentes");
+  await revalidateSite(supabase, weddingId);
   return { ok: true };
 }
 
@@ -245,6 +247,8 @@ export async function addGift(formData: FormData) {
 export async function deleteGift(formData: FormData) {
   const supabase = await createClient();
   const id = formData.get("id") as string;
+  const weddingId = formData.get("wedding_id") as string | null;
   await supabase.from("gifts").delete().eq("id", id);
   revalidatePath("/painel/presentes");
+  if (weddingId) await revalidateSite(supabase, weddingId);
 }

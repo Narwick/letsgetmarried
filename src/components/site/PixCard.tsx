@@ -30,7 +30,7 @@ export function PixCard({ payload }: { payload: string }) {
       )}
       <button
         onClick={copy}
-        className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+        className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
       >
         {copied ? "Copiado!" : "Copiar código PIX"}
       </button>
