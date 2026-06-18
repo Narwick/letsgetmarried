@@ -40,6 +40,25 @@ export async function getOrCreateWedding() {
   return created;
 }
 
+/** Salva o tema (paleta) escolhido para o site. */
+export async function saveTheme(weddingId: string, theme: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { error } = await supabase
+    .from("weddings")
+    .update({ theme })
+    .eq("id", weddingId)
+    .eq("owner_id", user.id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/painel/editar");
+  return { ok: true };
+}
+
 /** Salva (ou remove) a URL da foto de capa do casamento. */
 export async function saveCoverPhoto(weddingId: string, url: string | null) {
   const supabase = await createClient();

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { buildPixPayload } from "@/lib/pix";
+import { themeStyle } from "@/lib/themes";
 import { PixCard } from "@/components/site/PixCard";
 import type { Gift, Wedding } from "@/lib/types";
 
@@ -102,7 +103,7 @@ export default async function PublicSite({
   const eventDate = wedding.event_date ? new Date(wedding.event_date) : null;
 
   return (
-    <div className="bg-stone-50 text-stone-800">
+    <div className="bg-background text-foreground" style={themeStyle(wedding.theme)}>
       {isPreview && (
         <div className="bg-amber-500 px-4 py-2 text-center text-sm font-medium text-white">
           Pré-visualização (rascunho) — só você vê esta página. Publique no painel para
@@ -146,13 +147,13 @@ export default async function PublicSite({
       {wedding.story && (
         <section className="mx-auto max-w-2xl px-6 py-20 text-center">
           <h2 className="mb-6 font-serif text-3xl text-foreground">Nossa história</h2>
-          <p className="whitespace-pre-line leading-relaxed text-stone-600">{wedding.story}</p>
+          <p className="whitespace-pre-line leading-relaxed text-muted">{wedding.story}</p>
         </section>
       )}
 
       {/* Save the date / informações */}
       {(eventDate || wedding.event_location || wedding.event_details) && (
-        <section className="bg-white px-6 py-20">
+        <section className="bg-surface px-6 py-20">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="mb-6 font-serif text-3xl text-foreground">Save the date</h2>
             {eventDate && (
@@ -167,9 +168,9 @@ export default async function PublicSite({
                 })}
               </p>
             )}
-            {wedding.event_location && <p className="mt-2 text-stone-600">{wedding.event_location}</p>}
+            {wedding.event_location && <p className="mt-2 text-muted">{wedding.event_location}</p>}
             {wedding.event_details && (
-              <p className="mt-4 whitespace-pre-line text-sm text-stone-500">{wedding.event_details}</p>
+              <p className="mt-4 whitespace-pre-line text-sm text-muted">{wedding.event_details}</p>
             )}
           </div>
         </section>
@@ -181,10 +182,10 @@ export default async function PublicSite({
           <h2 className="mb-8 text-center font-serif text-3xl text-foreground">Lista de presentes</h2>
           <div className="grid gap-6 sm:grid-cols-2">
             {regularGifts.map((g) => (
-              <div key={g.id} className="rounded-xl border border-stone-200 bg-white p-6">
-                <p className="font-medium">{g.title}</p>
-                {g.description && <p className="mb-3 text-sm text-stone-500">{g.description}</p>}
-                <p className="mb-4 text-sm text-stone-600">{brl(g.suggested_amount)}</p>
+              <div key={g.id} className="rounded-2xl border border-border bg-surface p-6">
+                <p className="font-medium text-foreground">{g.title}</p>
+                {g.description && <p className="mb-3 text-sm text-muted">{g.description}</p>}
+                <p className="mb-4 text-sm text-muted">{brl(g.suggested_amount)}</p>
                 <PixCard payload={pixFor(g.suggested_amount)!} />
               </div>
             ))}
@@ -194,19 +195,19 @@ export default async function PublicSite({
 
       {/* Fundo da lua de mel */}
       {hasPix && (
-        <section className="bg-white px-6 py-16">
+        <section className="bg-surface px-6 py-16">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="mb-2 font-serif text-3xl text-foreground">Ajude na nossa lua de mel ✈️</h2>
-            <p className="mb-8 text-stone-600">
+            <p className="mb-8 text-muted">
               Contribua com qualquer valor via PIX para a nossa viagem.
             </p>
             {honeymoon.length > 0 ? (
               <div className="grid gap-6 sm:grid-cols-2">
                 {honeymoon.map((g) => (
-                  <div key={g.id} className="rounded-xl border border-stone-200 p-6">
-                    <p className="font-medium">{g.title}</p>
-                    {g.description && <p className="mb-3 text-sm text-stone-500">{g.description}</p>}
-                    <p className="mb-4 text-sm text-stone-600">{brl(g.suggested_amount)}</p>
+                  <div key={g.id} className="rounded-2xl border border-border p-6">
+                    <p className="font-medium text-foreground">{g.title}</p>
+                    {g.description && <p className="mb-3 text-sm text-muted">{g.description}</p>}
+                    <p className="mb-4 text-sm text-muted">{brl(g.suggested_amount)}</p>
                     <PixCard payload={pixFor(g.suggested_amount)!} />
                   </div>
                 ))}
@@ -220,7 +221,7 @@ export default async function PublicSite({
         </section>
       )}
 
-      <footer className="px-6 py-10 text-center text-sm text-stone-400">
+      <footer className="px-6 py-10 text-center text-sm text-muted">
         Feito com ❤️ para {wedding.couple_names ?? "o casal"}.
       </footer>
     </div>
