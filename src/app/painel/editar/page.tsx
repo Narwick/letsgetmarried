@@ -32,13 +32,12 @@ export default async function EditarPage() {
         <CoverPhotoUpload weddingId={wedding.id} initialUrl={wedding.cover_photo_url} />
       </section>
 
-      <EditForm wedding={wedding} />
-
       <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
         <div>
           <h2 className="font-serif text-xl text-foreground">Nossa história (linha do tempo)</h2>
           <p className="text-sm text-muted">
             Capítulos da história de vocês. Aparecem como uma timeline no site.
+            Tem o próprio botão de salvar.
           </p>
         </div>
         <TimelineEditor weddingId={wedding.id} initial={wedding.story_timeline ?? []} />
@@ -49,11 +48,13 @@ export default async function EditarPage() {
           <h2 className="font-serif text-xl text-foreground">Programação do dia</h2>
           <p className="text-sm text-muted">
             Horários do grande dia (cerimônia, fotos, festa…). Ative a exibição em
-            &quot;Detalhes &amp; encerramento&quot;.
+            &quot;Detalhes &amp; encerramento&quot;. Tem o próprio botão de salvar.
           </p>
         </div>
         <ScheduleEditor weddingId={wedding.id} initial={wedding.schedule ?? []} />
       </section>
+
+      <EditForm wedding={wedding} />
     </div>
   );
 }

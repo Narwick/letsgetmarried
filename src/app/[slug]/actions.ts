@@ -28,7 +28,10 @@ export async function submitRsvp(input: RsvpInput): Promise<{ ok?: boolean; erro
     p_message: input.message ?? "",
   });
 
-  if (error) return { error: "Não foi possível registrar agora. Tente novamente." };
+  if (error) {
+    // A função retorna mensagens claras (ex.: "Site indisponível para confirmações.").
+    return { error: error.message || "Não foi possível registrar agora. Tente novamente." };
+  }
 
   revalidatePath(`/${input.slug}`);
   return { ok: true };
