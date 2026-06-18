@@ -20,6 +20,9 @@ export default function PainelLayout({
             <Link href="/painel/presentes" className="text-muted transition hover:text-accent">
               Presentes
             </Link>
+            <Link href="/painel/confirmacoes" className="text-muted transition hover:text-accent">
+              Confirmações
+            </Link>
           </nav>
           <form action={signOut}>
             <button className="text-sm text-muted transition hover:text-accent">Sair</button>

@@ -2,6 +2,8 @@ import { getOrCreateWedding } from "../actions";
 import { EditForm } from "@/components/painel/EditForm";
 import { CoverPhotoUpload } from "@/components/painel/CoverPhotoUpload";
 import { ThemePicker } from "@/components/painel/ThemePicker";
+import { TimelineEditor } from "@/components/painel/TimelineEditor";
+import { ScheduleEditor } from "@/components/painel/ScheduleEditor";
 import { DEFAULT_THEME } from "@/lib/themes";
 import type { Wedding } from "@/lib/types";
 
@@ -31,6 +33,27 @@ export default async function EditarPage() {
       </section>
 
       <EditForm wedding={wedding} />
+
+      <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
+        <div>
+          <h2 className="font-serif text-xl text-foreground">Nossa história (linha do tempo)</h2>
+          <p className="text-sm text-muted">
+            Capítulos da história de vocês. Aparecem como uma timeline no site.
+          </p>
+        </div>
+        <TimelineEditor weddingId={wedding.id} initial={wedding.story_timeline ?? []} />
+      </section>
+
+      <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
+        <div>
+          <h2 className="font-serif text-xl text-foreground">Programação do dia</h2>
+          <p className="text-sm text-muted">
+            Horários do grande dia (cerimônia, fotos, festa…). Ative a exibição em
+            &quot;Detalhes &amp; encerramento&quot;.
+          </p>
+        </div>
+        <ScheduleEditor weddingId={wedding.id} initial={wedding.schedule ?? []} />
+      </section>
     </div>
   );
 }

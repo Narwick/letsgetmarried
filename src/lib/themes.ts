@@ -3,24 +3,54 @@ import type { CSSProperties } from "react";
 /**
  * Paletas que o casal pode escolher para o seu site. Cada tema define as
  * variáveis CSS aplicadas no site público (escopo por página).
+ *
+ * Além das cores claras (seções claras), cada tema traz um tom escuro
+ * coordenado ("ink") usado nas seções dramáticas (O Dia, Presentes).
  */
+export interface ThemeVars {
+  background: string;
+  surface: string;
+  foreground: string;
+  muted: string;
+  border: string;
+  accent: string;
+  accentHover: string;
+  accentSoft: string;
+  ink: string; // fundo das seções escuras
+  inkSoft: string; // fim do gradiente / bordas
+  onInk: string; // texto claro sobre o escuro
+  onInkSoft: string; // texto claro secundário
+  inkAccent: string; // destaque (dourado) sobre o escuro
+}
+
 export interface Theme {
   id: string;
   label: string;
   description: string;
-  vars: {
-    background: string;
-    surface: string;
-    foreground: string;
-    muted: string;
-    border: string;
-    accent: string;
-    accentHover: string;
-    accentSoft: string;
-  };
+  vars: ThemeVars;
 }
 
 export const THEMES: Theme[] = [
+  {
+    id: "navy",
+    label: "Navy & Dourado",
+    description: "Clássico, elegante e formal",
+    vars: {
+      background: "#f7f1e6",
+      surface: "#fcf7ed",
+      foreground: "#1e242c",
+      muted: "#55504a",
+      border: "#e4dcc8",
+      accent: "#a8863f",
+      accentHover: "#8c6f31",
+      accentSoft: "#f0e7cf",
+      ink: "#0f1d33",
+      inkSoft: "#16294a",
+      onInk: "#f7f1e6",
+      onInkSoft: "#c7cedd",
+      inkAccent: "#dcc187",
+    },
+  },
   {
     id: "sage",
     label: "Sage",
@@ -31,9 +61,14 @@ export const THEMES: Theme[] = [
       foreground: "#2b2b28",
       muted: "#6f7268",
       border: "#e4e3da",
-      accent: "#7c8a6f",
-      accentHover: "#67745c",
+      accent: "#67745c",
+      accentHover: "#525d49",
       accentSoft: "#e8ece2",
+      ink: "#2f3a2c",
+      inkSoft: "#3c4a37",
+      onInk: "#f3f1e8",
+      onInkSoft: "#cdd3c4",
+      inkAccent: "#b6c2a3",
     },
   },
   {
@@ -46,9 +81,14 @@ export const THEMES: Theme[] = [
       foreground: "#2b2724",
       muted: "#756f68",
       border: "#ece4dc",
-      accent: "#b76e79",
-      accentHover: "#a25c67",
+      accent: "#a25c67",
+      accentHover: "#874c55",
       accentSoft: "#f5e7e9",
+      ink: "#3a2a2e",
+      inkSoft: "#4a363b",
+      onInk: "#f7efe9",
+      onInkSoft: "#d9c9c2",
+      inkAccent: "#d8a7af",
     },
   },
   {
@@ -61,24 +101,14 @@ export const THEMES: Theme[] = [
       foreground: "#322a22",
       muted: "#7a6f63",
       border: "#ece0d3",
-      accent: "#c2724a",
-      accentHover: "#a85d3a",
+      accent: "#a85d3a",
+      accentHover: "#8c4c2f",
       accentSoft: "#f4e3d6",
-    },
-  },
-  {
-    id: "navy",
-    label: "Azul marinho",
-    description: "Clássico elegante e formal",
-    vars: {
-      background: "#f6f7f9",
-      surface: "#ffffff",
-      foreground: "#1f2a3c",
-      muted: "#5d6675",
-      border: "#dde1e8",
-      accent: "#2f4a6b",
-      accentHover: "#23394f",
-      accentSoft: "#e1e7f0",
+      ink: "#2e2620",
+      inkSoft: "#3e342b",
+      onInk: "#f7efe6",
+      onInkSoft: "#d9cdbf",
+      inkAccent: "#e0a877",
     },
   },
   {
@@ -91,9 +121,14 @@ export const THEMES: Theme[] = [
       foreground: "#2e2838",
       muted: "#6d6580",
       border: "#e7e1ee",
-      accent: "#8a72b0",
-      accentHover: "#74609a",
+      accent: "#74609a",
+      accentHover: "#5f4e82",
       accentSoft: "#ece5f5",
+      ink: "#2b2438",
+      inkSoft: "#392f4c",
+      onInk: "#f2edf8",
+      onInkSoft: "#cfc6dd",
+      inkAccent: "#bda9dd",
     },
   },
   {
@@ -109,11 +144,16 @@ export const THEMES: Theme[] = [
       accent: "#1a1a1a",
       accentHover: "#000000",
       accentSoft: "#ededed",
+      ink: "#161616",
+      inkSoft: "#262626",
+      onInk: "#f4f4f4",
+      onInkSoft: "#bdbdbd",
+      inkAccent: "#d8d8d8",
     },
   },
 ];
 
-export const DEFAULT_THEME = "sage";
+export const DEFAULT_THEME = "navy";
 export const CUSTOM_THEME = "custom";
 
 export function getTheme(id: string | null | undefined): Theme {
@@ -136,7 +176,7 @@ function darken(hex: string, f: number): string {
   const [r, g, b] = hexToRgb(hex);
   return rgbToHex(r * (1 - f), g * (1 - f), b * (1 - f));
 }
-/** Mistura a cor com branco por uma fração (0–1) — versão "suave". */
+/** Clareia em direção ao branco por uma fração (0–1). */
 function mixWhite(hex: string, f: number): string {
   const [r, g, b] = hexToRgb(hex);
   return rgbToHex(r + (255 - r) * f, g + (255 - g) * f, b + (255 - b) * f);
@@ -164,6 +204,11 @@ export function buildCustomTheme(accent: string | null | undefined): Theme {
       accent: normalized,
       accentHover: darken(normalized, 0.15),
       accentSoft: mixWhite(normalized, 0.85),
+      ink: darken(normalized, 0.78),
+      inkSoft: darken(normalized, 0.68),
+      onInk: "#f7f4ee",
+      onInkSoft: mixWhite(normalized, 0.55),
+      inkAccent: mixWhite(normalized, 0.45),
     },
   };
 }
@@ -172,7 +217,7 @@ export function buildCustomTheme(accent: string | null | undefined): Theme {
 export function resolveThemeVars(
   themeId: string | null | undefined,
   customAccent: string | null | undefined,
-): Theme["vars"] {
+): ThemeVars {
   if (themeId === CUSTOM_THEME) return buildCustomTheme(customAccent).vars;
   return getTheme(themeId).vars;
 }
@@ -192,5 +237,10 @@ export function themeStyle(
     "--accent": v.accent,
     "--accent-hover": v.accentHover,
     "--accent-soft": v.accentSoft,
+    "--ink": v.ink,
+    "--ink-soft": v.inkSoft,
+    "--on-ink": v.onInk,
+    "--on-ink-soft": v.onInkSoft,
+    "--ink-accent": v.inkAccent,
   } as CSSProperties;
 }

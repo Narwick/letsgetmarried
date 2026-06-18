@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { PixKeyType } from "@/lib/types";
+import type { PixKeyType, PlaceInfo, ScheduleEntry, TimelineEntry } from "@/lib/types";
 
 /** Sai da conta. */
 export async function signOut() {
@@ -96,6 +96,58 @@ export async function saveCoverPhoto(weddingId: string, url: string | null) {
   return { ok: true };
 }
 
+/** Salva a timeline da história (array completo). */
+export async function saveTimeline(weddingId: string, entries: TimelineEntry[]) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const clean = entries
+    .map((e) => ({
+      ano: (e.ano ?? "").trim(),
+      titulo: (e.titulo ?? "").trim(),
+      texto: (e.texto ?? "").trim(),
+    }))
+    .filter((e) => e.ano || e.titulo || e.texto);
+
+  const { error } = await supabase
+    .from("weddings")
+    .update({ story_timeline: clean })
+    .eq("id", weddingId)
+    .eq("owner_id", user.id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/painel/editar");
+  await revalidateSite(supabase, weddingId);
+  return { ok: true };
+}
+
+/** Salva a programação do dia (array completo). */
+export async function saveSchedule(weddingId: string, entries: ScheduleEntry[]) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const clean = entries
+    .map((e) => ({ hora: (e.hora ?? "").trim(), evento: (e.evento ?? "").trim() }))
+    .filter((e) => e.hora || e.evento);
+
+  const { error } = await supabase
+    .from("weddings")
+    .update({ schedule: clean })
+    .eq("id", weddingId)
+    .eq("owner_id", user.id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/painel/editar");
+  await revalidateSite(supabase, weddingId);
+  return { ok: true };
+}
+
 function str(form: FormData, key: string): string | null {
   const v = form.get(key);
   const s = typeof v === "string" ? v.trim() : "";
@@ -119,6 +171,21 @@ export async function saveWedding(formData: FormData) {
 
   const eventDateRaw = str(formData, "event_date");
 
+  // Monta os objetos de local (cerimônia/recepção) a partir dos campos planos.
+  const place = (prefix: string): PlaceInfo | null => {
+    const local = str(formData, `${prefix}_local`);
+    const endereco = str(formData, `${prefix}_endereco`);
+    const horario = str(formData, `${prefix}_horario`);
+    const maps = str(formData, `${prefix}_maps`);
+    if (!local && !endereco && !horario && !maps) return null;
+    return {
+      local: local ?? "",
+      endereco: endereco ?? "",
+      horario: horario ?? "",
+      maps: maps ?? "",
+    };
+  };
+
   const { error } = await supabase
     .from("weddings")
     .update({
@@ -132,6 +199,15 @@ export async function saveWedding(formData: FormData) {
       pix_key_type: (str(formData, "pix_key_type") as PixKeyType) || null,
       pix_recipient_name: str(formData, "pix_recipient_name"),
       pix_city: str(formData, "pix_city"),
+      monogram_left: str(formData, "monogram_left"),
+      monogram_right: str(formData, "monogram_right"),
+      verse: str(formData, "verse"),
+      verse_ref: str(formData, "verse_ref"),
+      dress_code: str(formData, "dress_code"),
+      ceremony: place("ceremony"),
+      reception: place("reception"),
+      show_reception: formData.get("show_reception") === "on",
+      show_schedule: formData.get("show_schedule") === "on",
     })
     .eq("id", id)
     .eq("owner_id", user.id);
