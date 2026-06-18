@@ -219,7 +219,9 @@ export async function saveWedding(formData: FormData) {
 
   revalidatePath("/painel/editar");
   revalidatePath(`/${slug}`);
-  return { ok: true };
+  revalidatePath("/painel");
+  // Salvou com sucesso → volta para a tela principal do painel.
+  redirect("/painel");
 }
 
 /** Adiciona um presente ou item do fundo de viagem. */
@@ -236,6 +238,36 @@ export async function addGift(formData: FormData) {
     is_honeymoon_fund: formData.get("is_honeymoon_fund") === "on",
     suggested_amount: amountRaw ? Math.round(parseFloat(amountRaw) * 100) : null,
   });
+
+  if (error) return { error: error.message };
+  revalidatePath("/painel/presentes");
+  await revalidateSite(supabase, weddingId);
+  return { ok: true };
+}
+
+/** Atualiza um presente já cadastrado. */
+export async function updateGift(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const id = formData.get("id") as string;
+  const weddingId = formData.get("wedding_id") as string;
+  const amountRaw = str(formData, "suggested_amount");
+
+  const { error } = await supabase
+    .from("gifts")
+    .update({
+      title: str(formData, "title") || "Presente",
+      description: str(formData, "description"),
+      image_url: str(formData, "image_url"),
+      is_honeymoon_fund: formData.get("is_honeymoon_fund") === "on",
+      suggested_amount: amountRaw ? Math.round(parseFloat(amountRaw) * 100) : null,
+    })
+    .eq("id", id)
+    .eq("wedding_id", weddingId);
 
   if (error) return { error: error.message };
   revalidatePath("/painel/presentes");
