@@ -10,7 +10,7 @@ async function action(_prev: State, formData: FormData): Promise<State> {
 }
 
 const inputCls =
-  "mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900";
+  "mt-1 w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-accent";
 
 export function AddGiftForm({ weddingId }: { weddingId: string }) {
   const [state, formAction, pending] = useActionState<State, FormData>(action, null);
@@ -23,17 +23,17 @@ export function AddGiftForm({ weddingId }: { weddingId: string }) {
         await formAction(fd);
         ref.current?.reset();
       }}
-      className="space-y-4 rounded-xl border border-gray-200 bg-white p-5"
+      className="space-y-4 rounded-2xl border border-border bg-surface p-5"
     >
       <input type="hidden" name="wedding_id" value={weddingId} />
-      <h2 className="font-medium">Adicionar presente</h2>
+      <h2 className="font-serif text-xl text-foreground">Adicionar presente</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Título</label>
+          <label className="block text-sm font-medium text-foreground">Título</label>
           <input name="title" required className={inputCls} placeholder="Jogo de panelas" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Valor sugerido (R$)</label>
+          <label className="block text-sm font-medium text-foreground">Valor sugerido (R$)</label>
           <input name="suggested_amount" type="number" step="0.01" min="0" className={inputCls} placeholder="deixe em branco p/ valor livre" />
         </div>
       </div>
@@ -41,15 +41,15 @@ export function AddGiftForm({ weddingId }: { weddingId: string }) {
         <label className="block text-sm font-medium text-gray-700">Descrição</label>
         <input name="description" className={inputCls} />
       </div>
-      <label className="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" name="is_honeymoon_fund" className="h-4 w-4" />
+      <label className="flex items-center gap-2 text-sm text-foreground">
+        <input type="checkbox" name="is_honeymoon_fund" className="h-4 w-4 accent-accent" />
         É um item do fundo da lua de mel (doação de viagem)
       </label>
       <div className="flex items-center gap-3">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-gray-900 px-4 py-2 font-medium text-white disabled:opacity-50"
+          className="rounded-full bg-accent px-4 py-2 font-medium text-white transition hover:bg-accent-hover disabled:opacity-50"
         >
           {pending ? "Adicionando..." : "Adicionar"}
         </button>

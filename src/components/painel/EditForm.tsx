@@ -10,9 +10,9 @@ async function action(_prev: State, formData: FormData): Promise<State> {
   return await saveWedding(formData);
 }
 
-const labelCls = "block text-sm font-medium text-gray-700";
+const labelCls = "block text-sm font-medium text-foreground";
 const inputCls =
-  "mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900";
+  "mt-1 w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-accent";
 
 function dateForInput(iso: string | null): string {
   if (!iso) return "";
@@ -27,8 +27,8 @@ export function EditForm({ wedding }: { wedding: Wedding }) {
     <form action={formAction} className="space-y-8">
       <input type="hidden" name="id" value={wedding.id} />
 
-      <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
-        <h2 className="font-medium">O casal</h2>
+      <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
+        <h2 className="font-serif text-xl text-foreground">O casal</h2>
         <div>
           <label className={labelCls}>Nome do casal</label>
           <input name="couple_names" defaultValue={wedding.couple_names ?? ""} className={inputCls} placeholder="João & Maria" />
@@ -36,7 +36,7 @@ export function EditForm({ wedding }: { wedding: Wedding }) {
         <div>
           <label className={labelCls}>Endereço do site (slug)</label>
           <input name="slug" defaultValue={wedding.slug} className={inputCls} placeholder="joao-e-maria" />
-          <p className="mt-1 text-xs text-gray-500">Só letras minúsculas, números e hífens. Ex.: joao-e-maria</p>
+          <p className="mt-1 text-xs text-muted">Só letras minúsculas, números e hífens. Ex.: joao-e-maria</p>
         </div>
         <div>
           <label className={labelCls}>Nossa história</label>
@@ -44,8 +44,8 @@ export function EditForm({ wedding }: { wedding: Wedding }) {
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
-        <h2 className="font-medium">Save the date</h2>
+      <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
+        <h2 className="font-serif text-xl text-foreground">Save the date</h2>
         <div>
           <label className={labelCls}>Data e hora</label>
           <input type="datetime-local" name="event_date" defaultValue={dateForInput(wedding.event_date)} className={inputCls} />
@@ -60,9 +60,9 @@ export function EditForm({ wedding }: { wedding: Wedding }) {
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
-        <h2 className="font-medium">Dados PIX (recebimento dos presentes)</h2>
-        <p className="text-sm text-gray-500">
+      <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
+        <h2 className="font-serif text-xl text-foreground">Dados PIX (recebimento dos presentes)</h2>
+        <p className="text-sm text-muted">
           Os convidados pagam direto na sua conta. Mostramos a chave e o QR Code no site.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -96,7 +96,7 @@ export function EditForm({ wedding }: { wedding: Wedding }) {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-gray-900 px-5 py-2.5 font-medium text-white disabled:opacity-50"
+          className="rounded-full bg-accent px-5 py-2.5 font-medium text-white transition hover:bg-accent-hover disabled:opacity-50"
         >
           {pending ? "Salvando..." : "Salvar alterações"}
         </button>

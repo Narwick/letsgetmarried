@@ -27,19 +27,19 @@ export default async function PainelHome() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Seu site de casamento</h1>
+        <h1 className="font-serif text-2xl text-foreground">Seu site de casamento</h1>
         {statusBadge(wedding.status)}
       </div>
 
-      <section className="rounded-xl border border-gray-200 bg-white p-5">
-        <p className="text-sm text-gray-500">Endereço do site</p>
+      <section className="rounded-2xl border border-border bg-surface p-5">
+        <p className="text-sm text-muted">Endereço do site</p>
         <div className="mt-1 flex items-center gap-3">
-          <Link href={`/${wedding.slug}`} className="font-medium text-blue-600 hover:underline">
+          <Link href={`/${wedding.slug}`} className="font-medium text-accent hover:underline">
             {publicUrl}
           </Link>
         </div>
         {isLive && wedding.expires_at && (
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-muted">
             Ativo até {new Date(wedding.expires_at).toLocaleDateString("pt-BR")}.
           </p>
         )}
@@ -48,29 +48,29 @@ export default async function PainelHome() {
       <section className="grid gap-3 sm:grid-cols-2">
         <Link
           href="/painel/editar"
-          className="rounded-xl border border-gray-200 bg-white p-5 hover:border-gray-400"
+          className="rounded-2xl border border-border bg-surface p-5 transition hover:border-accent"
         >
-          <p className="font-medium">Editar conteúdo</p>
-          <p className="text-sm text-gray-500">História, save the date, infos e dados PIX.</p>
+          <p className="font-medium text-foreground">Editar conteúdo</p>
+          <p className="text-sm text-muted">História, save the date, infos e dados PIX.</p>
         </Link>
         <Link
           href="/painel/presentes"
-          className="rounded-xl border border-gray-200 bg-white p-5 hover:border-gray-400"
+          className="rounded-2xl border border-border bg-surface p-5 transition hover:border-accent"
         >
-          <p className="font-medium">Lista de presentes</p>
-          <p className="text-sm text-gray-500">Presentes e fundo da lua de mel.</p>
+          <p className="font-medium text-foreground">Lista de presentes</p>
+          <p className="text-sm text-muted">Presentes e fundo da lua de mel.</p>
         </Link>
       </section>
 
-      <section className="rounded-xl border border-gray-200 bg-white p-5">
+      <section className="rounded-2xl border border-border bg-surface p-5">
         {isLive ? (
           <p className="text-sm text-green-700">
             🎉 Seu site está no ar! Compartilhe o link com os convidados.
           </p>
         ) : (
           <>
-            <p className="mb-1 font-medium">Publicar site</p>
-            <p className="mb-4 text-sm text-gray-500">
+            <p className="mb-1 font-medium text-foreground">Publicar site</p>
+            <p className="mb-4 text-sm text-muted">
               Pague a assinatura anual via PIX para deixar seu site público por 1 ano.
             </p>
             <PublishButton weddingId={wedding.id} />

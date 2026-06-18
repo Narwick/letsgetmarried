@@ -20,30 +20,30 @@ export default async function PresentesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Lista de presentes</h1>
+      <h1 className="font-serif text-2xl text-foreground">Lista de presentes</h1>
 
       <AddGiftForm weddingId={wedding.id} />
 
       <section className="space-y-3">
         {gifts.length === 0 && (
-          <p className="text-sm text-gray-500">Nenhum presente cadastrado ainda.</p>
+          <p className="text-sm text-muted">Nenhum presente cadastrado ainda.</p>
         )}
         {gifts.map((g) => (
           <div
             key={g.id}
-            className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4"
+            className="flex items-center justify-between rounded-2xl border border-border bg-surface p-4"
           >
             <div>
-              <p className="font-medium">
+              <p className="font-medium text-foreground">
                 {g.title}
                 {g.is_honeymoon_fund && (
-                  <span className="ml-2 rounded bg-pink-100 px-2 py-0.5 text-xs text-pink-700">
+                  <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 text-xs text-accent-hover">
                     Lua de mel
                   </span>
                 )}
               </p>
-              {g.description && <p className="text-sm text-gray-500">{g.description}</p>}
-              <p className="text-sm text-gray-500">{brl(g.suggested_amount)}</p>
+              {g.description && <p className="text-sm text-muted">{g.description}</p>}
+              <p className="text-sm text-muted">{brl(g.suggested_amount)}</p>
             </div>
             <form action={deleteGift}>
               <input type="hidden" name="id" value={g.id} />

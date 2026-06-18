@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { buildPixPayload } from "@/lib/pix";
 import { PixCard } from "@/components/site/PixCard";
 import type { Gift, Wedding } from "@/lib/types";
@@ -18,6 +19,34 @@ async function getPublishedWedding(slug: string): Promise<Wedding | null> {
     .gt("expires_at", new Date().toISOString())
     .maybeSingle();
   return (data as Wedding) ?? null;
+}
+
+/**
+ * Resolve o casamento a exibir:
+ *  - se publicado e no prazo → site público;
+ *  - senão, se o usuário logado for o dono → preview do rascunho.
+ */
+async function resolveWedding(
+  slug: string,
+): Promise<{ wedding: Wedding | null; isPreview: boolean }> {
+  const published = await getPublishedWedding(slug);
+  if (published) return { wedding: published, isPreview: false };
+
+  // Fallback: preview para o dono logado (respeita RLS).
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { wedding: null, isPreview: false };
+
+  const { data } = await supabase
+    .from("weddings")
+    .select("*")
+    .eq("slug", slug)
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  return data ? { wedding: data as Wedding, isPreview: true } : { wedding: null, isPreview: false };
 }
 
 export async function generateMetadata({
@@ -45,7 +74,7 @@ export default async function PublicSite({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const wedding = await getPublishedWedding(slug);
+  const { wedding, isPreview } = await resolveWedding(slug);
   if (!wedding) notFound();
 
   const supabase = createAdminClient();
@@ -74,42 +103,58 @@ export default async function PublicSite({
 
   return (
     <div className="bg-stone-50 text-stone-800">
+      {isPreview && (
+        <div className="bg-amber-500 px-4 py-2 text-center text-sm font-medium text-white">
+          Pré-visualização (rascunho) — só você vê esta página. Publique no painel para
+          deixá-la pública.
+        </div>
+      )}
       {/* Hero */}
       <section
-        className="flex min-h-[60vh] flex-col items-center justify-center bg-cover bg-center px-6 py-20 text-center"
+        className="relative flex min-h-[70vh] flex-col items-center justify-center bg-cover bg-center px-6 py-20 text-center"
         style={
           wedding.cover_photo_url
             ? { backgroundImage: `url(${wedding.cover_photo_url})` }
             : undefined
         }
       >
-        <h1 className="text-4xl font-light tracking-wide sm:text-5xl">
-          {wedding.couple_names ?? "Nosso Casamento"}
-        </h1>
-        {eventDate && (
-          <p className="mt-4 text-lg">
-            {eventDate.toLocaleDateString("pt-BR", {
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
+        {wedding.cover_photo_url && (
+          <div className="absolute inset-0 bg-black/40" />
         )}
+        <div
+          className={`relative ${wedding.cover_photo_url ? "text-white" : "text-foreground"}`}
+        >
+          <p className="mb-4 text-xs uppercase tracking-[0.35em] opacity-80">
+            Vamos nos casar
+          </p>
+          <h1 className="font-serif text-5xl font-medium tracking-wide sm:text-7xl">
+            {wedding.couple_names ?? "Nosso Casamento"}
+          </h1>
+          {eventDate && (
+            <p className="mt-5 text-lg tracking-wide">
+              {eventDate.toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}
+            </p>
+          )}
+        </div>
       </section>
 
       {/* História */}
       {wedding.story && (
-        <section className="mx-auto max-w-2xl px-6 py-16 text-center">
-          <h2 className="mb-6 text-2xl font-light">Nossa história</h2>
+        <section className="mx-auto max-w-2xl px-6 py-20 text-center">
+          <h2 className="mb-6 font-serif text-3xl text-foreground">Nossa história</h2>
           <p className="whitespace-pre-line leading-relaxed text-stone-600">{wedding.story}</p>
         </section>
       )}
 
       {/* Save the date / informações */}
       {(eventDate || wedding.event_location || wedding.event_details) && (
-        <section className="bg-white px-6 py-16">
+        <section className="bg-white px-6 py-20">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="mb-6 text-2xl font-light">Save the date</h2>
+            <h2 className="mb-6 font-serif text-3xl text-foreground">Save the date</h2>
             {eventDate && (
               <p className="text-lg">
                 {eventDate.toLocaleString("pt-BR", {
@@ -133,7 +178,7 @@ export default async function PublicSite({
       {/* Lista de presentes */}
       {regularGifts.length > 0 && hasPix && (
         <section className="mx-auto max-w-3xl px-6 py-16">
-          <h2 className="mb-8 text-center text-2xl font-light">Lista de presentes</h2>
+          <h2 className="mb-8 text-center font-serif text-3xl text-foreground">Lista de presentes</h2>
           <div className="grid gap-6 sm:grid-cols-2">
             {regularGifts.map((g) => (
               <div key={g.id} className="rounded-xl border border-stone-200 bg-white p-6">
@@ -151,7 +196,7 @@ export default async function PublicSite({
       {hasPix && (
         <section className="bg-white px-6 py-16">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="mb-2 text-2xl font-light">Ajude na nossa lua de mel ✈️</h2>
+            <h2 className="mb-2 font-serif text-3xl text-foreground">Ajude na nossa lua de mel ✈️</h2>
             <p className="mb-8 text-stone-600">
               Contribua com qualquer valor via PIX para a nossa viagem.
             </p>

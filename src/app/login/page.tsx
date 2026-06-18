@@ -31,8 +31,8 @@ function LoginForm() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
-      <h1 className="mb-2 text-2xl font-semibold">Entrar</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-2 font-serif text-3xl text-foreground">Entrar</h1>
+      <p className="mb-6 text-sm text-muted">
         Enviaremos um link mágico para o seu e-mail. Sem senha.
       </p>
 
@@ -48,12 +48,12 @@ function LoginForm() {
             placeholder="seu@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-gray-900"
+            className="rounded-lg border border-border px-4 py-2.5 outline-none focus:border-accent"
           />
           <button
             type="submit"
             disabled={loading}
-            className="rounded-lg bg-gray-900 px-4 py-2.5 font-medium text-white disabled:opacity-50"
+            className="rounded-full bg-accent px-4 py-2.5 font-medium text-white transition hover:bg-accent-hover disabled:opacity-50"
           >
             {loading ? "Enviando..." : "Enviar link de acesso"}
           </button>

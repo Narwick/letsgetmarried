@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
+/* ── Design system ──────────────────────────────────────────────────────
+   Paleta clara e elegante para casamento. A cor de destaque (--accent) é
+   trocável num único lugar. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f6f1; /* creme frio */
+  --surface: #ffffff;
+  --foreground: #2b2b28; /* grafite quente */
+  --muted: #6f7268;
+  --border: #e4e3da;
+
+  /* Destaque — sage / verde sálvia */
+  --accent: #7c8a6f;
+  --accent-hover: #67745c;
+  --accent-soft: #e8ece2;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+/* Garante texto legível e fundo branco em todos os campos de formulário,
+   independentemente do tema do sistema operacional. */
+input,
+textarea,
+select {
+  color: var(--foreground);
+  background-color: #ffffff;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #a8a29e;
 }
