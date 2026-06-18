@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Gera o servidor "standalone" — imagem Docker enxuta para deploy no Coolify.
+  output: "standalone",
 };
 
 export default nextConfig;
