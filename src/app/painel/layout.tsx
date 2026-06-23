@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signOut } from "./actions";
+import { HelpButton } from "@/components/HelpButton";
 
 export default function PainelLayout({
   children,
@@ -30,6 +31,7 @@ export default function PainelLayout({
         </div>
       </header>
       <main className="mx-auto max-w-3xl px-6 py-8">{children}</main>
+      <HelpButton />
     </div>
   );
 }
