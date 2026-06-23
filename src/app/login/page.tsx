@@ -17,7 +17,10 @@ function LoginForm() {
     setLoading(true);
     setError(null);
     const supabase = createClient();
-    const emailRedirectTo = `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(
+    // Prefere a URL pública canônica; cai pro origin do navegador em dev.
+    const configured = process.env.NEXT_PUBLIC_SITE_URL;
+    const base = configured ? configured.replace(/\/+$/, "") : window.location.origin;
+    const emailRedirectTo = `${base}/auth/callback?redirect=${encodeURIComponent(
       redirect,
     )}`;
     const { error } = await supabase.auth.signInWithOtp({
