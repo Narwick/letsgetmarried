@@ -302,6 +302,26 @@ export async function updateGift(formData: FormData) {
   return { ok: true };
 }
 
+/** O dono marca/desmarca um presente como já presenteado (fica indisponível no site). */
+export async function setGiftClaimed(giftId: string, weddingId: string, claimed: boolean) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { error } = await supabase
+    .from("gifts")
+    .update({ claimed_at: claimed ? new Date().toISOString() : null })
+    .eq("id", giftId)
+    .eq("wedding_id", weddingId);
+
+  if (error) return { error: error.message };
+  revalidatePath("/painel/presentes");
+  await revalidateSite(supabase, weddingId);
+  return { ok: true };
+}
+
 /** Remove um presente. */
 export async function deleteGift(formData: FormData) {
   const supabase = await createClient();

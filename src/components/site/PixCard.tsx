@@ -6,15 +6,15 @@ import QRCode from "qrcode";
 /**
  * Mostra o QR Code (gerado no navegador a partir do payload) e o "copia e cola".
  */
-export function PixCard({ payload }: { payload: string }) {
+export function PixCard({ payload, size = 220 }: { payload: string; size?: number }) {
   const [qr, setQr] = useState<string>("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    QRCode.toDataURL(payload, { width: 220, margin: 1 })
+    QRCode.toDataURL(payload, { width: size, margin: 1 })
       .then(setQr)
       .catch(() => setQr(""));
-  }, [payload]);
+  }, [payload, size]);
 
   async function copy() {
     await navigator.clipboard.writeText(payload);
@@ -26,7 +26,7 @@ export function PixCard({ payload }: { payload: string }) {
     <div className="flex flex-col items-center gap-3">
       {qr && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={qr} alt="QR Code PIX" width={220} height={220} className="rounded-lg" />
+        <img src={qr} alt="QR Code PIX" width={size} height={size} className="rounded-lg" />
       )}
       <button
         onClick={copy}

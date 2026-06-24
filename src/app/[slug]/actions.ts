@@ -36,3 +36,23 @@ export async function submitRsvp(input: RsvpInput): Promise<{ ok?: boolean; erro
   revalidatePath(`/${input.slug}`);
   return { ok: true };
 }
+
+/**
+ * Convidado confirma que já presenteou um item. Usa a função claim_gift
+ * (SECURITY DEFINER), que valida se o site está publicado e se o item ainda
+ * está disponível antes de marcá-lo como escolhido.
+ */
+export async function claimGift(input: {
+  giftId: string;
+  slug: string;
+}): Promise<{ ok?: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("claim_gift", { p_gift_id: input.giftId });
+
+  if (error) {
+    return { error: error.message || "Não foi possível confirmar agora. Tente novamente." };
+  }
+
+  revalidatePath(`/${input.slug}`);
+  return { ok: true };
+}

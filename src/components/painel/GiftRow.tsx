@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { updateGift, deleteGift } from "@/app/painel/actions";
+import { updateGift, deleteGift, setGiftClaimed } from "@/app/painel/actions";
 import { uploadImage } from "@/lib/uploadImage";
 import { CurrencyInput } from "@/components/painel/CurrencyInput";
 import type { Gift } from "@/lib/types";
@@ -25,6 +25,16 @@ export function GiftRow({ gift, weddingId }: { gift: Gift; weddingId: string }) 
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [claimedAt, setClaimedAt] = useState<string | null>(gift.claimed_at);
+  const [claimPending, startClaim] = useTransition();
+
+  function toggleClaimed() {
+    const next = claimedAt ? null : new Date().toISOString();
+    startClaim(async () => {
+      const res = await setGiftClaimed(gift.id, weddingId, next !== null);
+      if (!res?.error) setClaimedAt(next);
+    });
+  }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -70,12 +80,26 @@ export function GiftRow({ gift, weddingId }: { gift: Gift; weddingId: string }) 
                   Lua de mel
                 </span>
               )}
+              {claimedAt && (
+                <span className="ml-2 rounded-full bg-stone-200 px-2 py-0.5 text-xs text-stone-600">
+                  Presenteado
+                </span>
+              )}
             </p>
             {gift.description && <p className="text-sm text-muted">{gift.description}</p>}
             <p className="text-sm text-muted">{brl(gift.suggested_amount)}</p>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-3">
+          {!gift.is_honeymoon_fund && (
+            <button
+              onClick={toggleClaimed}
+              disabled={claimPending}
+              className="text-sm text-muted hover:text-foreground disabled:opacity-50"
+            >
+              {claimedAt ? "Tornar disponível" : "Marcar presenteado"}
+            </button>
+          )}
           <button onClick={() => setEditing(true)} className="text-sm text-accent hover:underline">
             Editar
           </button>

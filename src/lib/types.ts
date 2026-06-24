@@ -76,6 +76,7 @@ export interface Gift {
   suggested_amount: number | null; // em centavos
   is_honeymoon_fund: boolean;
   sort_order: number;
+  claimed_at: string | null; // preenchido quando alguém confirma que já presenteou
   created_at: string;
 }
 

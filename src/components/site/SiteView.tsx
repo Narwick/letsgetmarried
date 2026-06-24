@@ -1,6 +1,6 @@
 import { buildPixPayload } from "@/lib/pix";
 import { themeStyle } from "@/lib/themes";
-import { PixCard } from "@/components/site/PixCard";
+import { GiftActions } from "@/components/site/GiftActions";
 import { Countdown } from "@/components/site/Countdown";
 import { Crest } from "@/components/site/Crest";
 import { RsvpForm } from "@/components/site/RsvpForm";
@@ -253,8 +253,8 @@ export function SiteView({
             </p>
           </div>
 
-          {regularGifts.length > 0 && <GiftGroup title="Para o nosso lar" gifts={regularGifts} pixFor={pixFor} />}
-          {honeymoon.length > 0 && <GiftGroup title="Para a nossa lua de mel ✈️" gifts={honeymoon} pixFor={pixFor} />}
+          {regularGifts.length > 0 && <GiftGroup title="Para o nosso lar" gifts={regularGifts} pixFor={pixFor} slug={wedding.slug} />}
+          {honeymoon.length > 0 && <GiftGroup title="Para a nossa lua de mel ✈️" gifts={honeymoon} pixFor={pixFor} slug={wedding.slug} />}
         </section>
       )}
 
@@ -300,29 +300,42 @@ function GiftGroup({
   title,
   gifts,
   pixFor,
+  slug,
 }: {
   title: string;
   gifts: Gift[];
   pixFor: (amount: number | null) => string | null;
+  slug: string;
 }) {
   return (
     <div className="mx-auto mb-10 max-w-4xl">
       <p className="mb-6 text-center text-[0.74rem] uppercase tracking-[0.28em] text-[var(--ink-accent)]">{title}</p>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {gifts.map((g) => (
-          <div key={g.id} className="overflow-hidden rounded-xl border p-5 text-center" style={{ borderColor: "var(--ink-soft)", background: "color-mix(in srgb, var(--on-ink) 4%, transparent)" }}>
-            {g.image_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={g.image_url} alt={g.title} className="mb-4 h-36 w-full rounded-lg object-cover" />
-            )}
-            <h4 className="font-serif text-xl text-[var(--on-ink)]">{g.title}</h4>
-            {g.description && <p className="mt-1 text-sm text-[var(--on-ink-soft)]">{g.description}</p>}
-            <p className="mt-1 mb-4 text-[var(--ink-accent)]">{brl(g.suggested_amount)}</p>
-            <div className="rounded-lg bg-white p-4">
-              <PixCard payload={pixFor(g.suggested_amount)!} />
+        {gifts.map((g) => {
+          const claimed = !g.is_honeymoon_fund && !!g.claimed_at;
+          return (
+            <div
+              key={g.id}
+              className={`overflow-hidden rounded-xl border p-5 text-center transition ${claimed ? "opacity-70" : ""}`}
+              style={{ borderColor: "var(--ink-soft)", background: "color-mix(in srgb, var(--on-ink) 4%, transparent)" }}
+            >
+              {g.image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={g.image_url} alt={g.title} className="mb-4 h-44 w-full rounded-lg object-cover" />
+              )}
+              <h4 className="font-serif text-xl text-[var(--on-ink)]">{g.title}</h4>
+              {g.description && <p className="mt-1 text-sm text-[var(--on-ink-soft)]">{g.description}</p>}
+              <p className="mt-1 mb-4 text-[var(--ink-accent)]">{brl(g.suggested_amount)}</p>
+              <GiftActions
+                giftId={g.id}
+                slug={slug}
+                payload={pixFor(g.suggested_amount)}
+                isHoneymoon={g.is_honeymoon_fund}
+                initialClaimed={claimed}
+              />
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
