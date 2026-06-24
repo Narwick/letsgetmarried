@@ -6,12 +6,15 @@
  */
 
 const BASE_URL = "https://api.abacatepay.com/v2";
+// Cupons ainda vivem na API v1 (POST /v1/coupon/create).
+const V1_BASE_URL = "https://api.abacatepay.com/v1";
 
 interface CreateCheckoutParams {
   productId: string;
   externalId: string; // referência interna (id do wedding)
   returnUrl: string;
   completionUrl: string;
+  coupons?: string[]; // códigos de cupom a aplicar no checkout
 }
 
 interface CheckoutResponse {
@@ -40,6 +43,7 @@ export async function createCheckout(p: CreateCheckoutParams): Promise<CheckoutR
       returnUrl: p.returnUrl,
       completionUrl: p.completionUrl,
       externalId: p.externalId,
+      ...(p.coupons?.length ? { coupons: p.coupons } : {}),
     }),
   });
 
@@ -50,6 +54,41 @@ export async function createCheckout(p: CreateCheckoutParams): Promise<CheckoutR
 
   const data = json.data;
   return { id: data.id, url: data.url, amount: data.amount };
+}
+
+interface CreateCouponParams {
+  code: string;
+  discountPercent: number; // 1–100
+  maxRedeems?: number; // -1 = ilimitado (padrão)
+  notes?: string;
+}
+
+/**
+ * Cria um cupom de desconto percentual na AbacatePay. É isso que faz o desconto
+ * valer no checkout (passamos o código em `coupons`). Lança em caso de erro.
+ */
+export async function createCoupon(p: CreateCouponParams): Promise<{ code: string }> {
+  const res = await fetch(`${V1_BASE_URL}/coupon/create`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      code: p.code,
+      discount: p.discountPercent,
+      discountKind: "PERCENTAGE",
+      maxRedeems: p.maxRedeems ?? -1,
+      notes: p.notes ?? "",
+    }),
+  });
+
+  const json = await res.json();
+  if (!res.ok || json.success === false || json.error) {
+    throw new Error(typeof json.error === "string" ? json.error : `AbacatePay HTTP ${res.status}`);
+  }
+
+  return { code: json.data?.code ?? p.code };
 }
 
 /** Extrai o id do checkout do payload do webhook, tolerando variações de formato. */

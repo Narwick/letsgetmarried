@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "ABACATEPAY_PRODUCT_ID não configurado." }, { status: 500 });
   }
 
-  const { weddingId } = await request.json();
+  const { weddingId, couponCode } = await request.json();
 
   // Confirma que o wedding é do usuário (RLS já protege, mas validamos).
   const { data: wedding } = await supabase
@@ -29,21 +29,56 @@ export async function POST(request: NextRequest) {
 
   if (!wedding) return NextResponse.json({ error: "Site não encontrado." }, { status: 404 });
 
+  const admin = createAdminClient();
+
+  // Valida o cupom (opcional). Inválido/inativo → 400 com mensagem amigável.
+  const normalizedCode = typeof couponCode === "string" ? couponCode.trim().toUpperCase() : "";
+  let coupon: {
+    id: string;
+    code: string;
+    commission_percent: number;
+    max_redeems: number;
+    redeems_count: number;
+  } | null = null;
+
+  if (normalizedCode) {
+    const { data } = await admin
+      .from("coupons")
+      .select("id, code, commission_percent, max_redeems, redeems_count, active")
+      .eq("code", normalizedCode)
+      .maybeSingle();
+
+    if (!data || !data.active) {
+      return NextResponse.json({ error: "Cupom inválido ou inativo." }, { status: 400 });
+    }
+    if (data.max_redeems !== -1 && data.redeems_count >= data.max_redeems) {
+      return NextResponse.json({ error: "Este cupom atingiu o limite de usos." }, { status: 400 });
+    }
+    coupon = data;
+  }
+
   try {
     const checkout = await createCheckout({
       productId: PRODUCT_ID,
       externalId: wedding.id,
       returnUrl: `${SITE_URL}/painel`,
       completionUrl: `${SITE_URL}/painel?pago=1`,
+      ...(coupon ? { coupons: [coupon.code] } : {}),
     });
 
+    // Preço cheio (centavos) para calcular o desconto efetivamente aplicado.
+    const fullPrice = Number(process.env.SUBSCRIPTION_PRICE_CENTS) || 9900;
+
     // Registra a cobrança pendente (idempotência do webhook usa esse id).
-    const admin = createAdminClient();
     await admin.from("payments").insert({
       wedding_id: wedding.id,
       abacatepay_billing_id: checkout.id,
       amount: checkout.amount,
       status: "pending",
+      coupon_id: coupon?.id ?? null,
+      coupon_code: coupon?.code ?? null,
+      discount_amount: coupon ? Math.max(0, fullPrice - checkout.amount) : 0,
+      commission_percent: coupon?.commission_percent ?? 0,
     });
 
     return NextResponse.json({ url: checkout.url, billingId: checkout.id });

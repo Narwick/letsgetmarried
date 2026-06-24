@@ -51,16 +51,34 @@ export async function POST(request: NextRequest) {
   if (checkoutId) {
     const { data: payment } = await admin
       .from("payments")
-      .select("id, wedding_id, status")
+      .select("id, wedding_id, status, amount, coupon_id, commission_percent")
       .eq("abacatepay_billing_id", checkoutId)
       .maybeSingle();
 
     if (payment) {
       if (payment.status === "paid") return NextResponse.json({ ok: true, alreadyProcessed: true });
+
+      // Comissão do cupom: % sobre o valor efetivamente pago.
+      const hasCoupon = !!payment.coupon_id;
+      const commissionAmount = hasCoupon
+        ? Math.round((payment.amount * payment.commission_percent) / 100)
+        : 0;
+
       await admin
         .from("payments")
-        .update({ status: "paid", paid_at: new Date().toISOString() })
+        .update({
+          status: "paid",
+          paid_at: new Date().toISOString(),
+          ...(hasCoupon
+            ? { commission_amount: commissionAmount, commission_status: "pending" }
+            : {}),
+        })
         .eq("id", payment.id);
+
+      if (hasCoupon) {
+        await admin.rpc("increment_coupon_redeems", { p_coupon_id: payment.coupon_id });
+      }
+
       await publishWedding(admin, payment.wedding_id);
       return NextResponse.json({ ok: true });
     }

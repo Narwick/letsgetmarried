@@ -1,12 +1,20 @@
 import Link from "next/link";
 import { signOut } from "./actions";
 import { HelpButton } from "@/components/HelpButton";
+import { createClient } from "@/lib/supabase/server";
+import { isAdminEmail } from "@/lib/admin-auth";
 
-export default function PainelLayout({
+export default async function PainelLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isAdmin = isAdminEmail(user?.email);
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface">
@@ -31,6 +39,11 @@ export default function PainelLayout({
             <Link href="/painel/confirmacoes" className="text-muted transition hover:text-accent">
               Confirmações
             </Link>
+            {isAdmin && (
+              <Link href="/painel/admin" className="text-accent transition hover:text-accent-hover">
+                Admin
+              </Link>
+            )}
           </nav>
           <form action={signOut}>
             <button className="text-sm text-muted transition hover:text-accent">Sair</button>

@@ -82,6 +82,8 @@ export interface Gift {
 
 export type PaymentStatus = "pending" | "paid" | "failed";
 
+export type CommissionStatus = "pending" | "paid";
+
 export interface Payment {
   id: string;
   wedding_id: string;
@@ -89,5 +91,27 @@ export interface Payment {
   amount: number; // em centavos
   status: PaymentStatus;
   paid_at: string | null;
+  created_at: string;
+  // Cupom de afiliado (quando a compra usou um cupom)
+  coupon_id: string | null;
+  coupon_code: string | null;
+  discount_amount: number; // em centavos
+  commission_percent: number; // snapshot no momento da compra
+  commission_amount: number; // em centavos, calculado ao pagar
+  commission_status: CommissionStatus | null;
+  commission_paid_at: string | null;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  owner_name: string;
+  owner_contact: string | null;
+  discount_percent: number;
+  commission_percent: number;
+  active: boolean;
+  max_redeems: number; // -1 = ilimitado
+  redeems_count: number;
+  notes: string | null;
   created_at: string;
 }
