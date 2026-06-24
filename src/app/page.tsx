@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { THEMES } from "@/lib/themes";
-import { Crest } from "@/components/site/Crest";
 import {
   CONTACT_EMAIL,
   mailtoLink,
@@ -107,9 +106,16 @@ export default function Home() {
       {/* ── Navbar ──────────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <span className="text-sm font-medium uppercase tracking-[0.25em] text-accent">
-            letsgetmarried
-          </span>
+          <Link href="/" aria-label="letsgetmarried — página inicial">
+            {/* eslint-disable-next-line @next/next/no-img-element -- logo SVG estático, sem otimização do next/image */}
+            <img
+              src="/logo-horizontal.svg"
+              alt="letsgetmarried"
+              width={180}
+              height={40}
+              className="h-9 w-auto"
+            />
+          </Link>
           <div className="flex items-center gap-3 sm:gap-5">
             <Link
               href="/login"
@@ -173,7 +179,8 @@ export default function Home() {
             }
           >
             <div className="flex flex-col items-center text-center">
-              <Crest left="A" right="B" size={88} />
+              {/* eslint-disable-next-line @next/next/no-img-element -- logo SVG estático, sem otimização do next/image */}
+              <img src="/logo-mark.svg" alt="" width={88} height={88} className="h-20 w-20" />
               <p className="mt-5 text-xs uppercase tracking-[0.3em] text-accent">
                 Vamos nos casar
               </p>
@@ -392,9 +399,14 @@ export default function Home() {
       {/* ── Footer ──────────────────────────────────────────────── */}
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted sm:flex-row">
-          <span className="font-medium uppercase tracking-[0.25em] text-accent">
-            letsgetmarried
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element -- logo SVG estático, sem otimização do next/image */}
+          <img
+            src="/logo-horizontal.svg"
+            alt="letsgetmarried"
+            width={160}
+            height={36}
+            className="h-8 w-auto"
+          />
           <p>© {new Date().getFullYear()} letsgetmarried. Feito com carinho.</p>
           <div className="flex items-center gap-4">
             <a

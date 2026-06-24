@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -34,6 +35,10 @@ function LoginForm() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
+      <Link href="/" aria-label="letsgetmarried — página inicial" className="mb-8 self-center">
+        {/* eslint-disable-next-line @next/next/no-img-element -- logo SVG estático, sem otimização do next/image */}
+        <img src="/logo-primary.svg" alt="letsgetmarried" width={200} height={130} className="h-32 w-auto" />
+      </Link>
       <h1 className="mb-2 font-serif text-3xl text-foreground">Entrar</h1>
       <p className="mb-6 text-sm text-muted">
         Enviaremos um link mágico para o seu e-mail. Sem senha.

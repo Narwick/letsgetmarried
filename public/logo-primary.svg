@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 300" width="460" height="300" role="img" aria-label="Let's Get Married">
+<defs><g id="sprig"><path d="M0,0 Q46,-16 94,-8" stroke="#5F7052" stroke-width="1.5" fill="none" stroke-linecap="round"/><ellipse cx="23.66" cy="0.08" rx="10.00" ry="4.20" fill="#5F7052" transform="rotate(27.29 23.66 0.08)"/><ellipse cx="33.54" cy="-15.00" rx="9.50" ry="3.99" fill="#5F7052" transform="rotate(-52.69 33.54 -15.00)"/><ellipse cx="48.00" cy="-4.37" rx="8.75" ry="3.67" fill="#5F7052" transform="rotate(35.38 48.00 -4.37)"/><ellipse cx="59.74" cy="-16.10" rx="8.00" ry="3.36" fill="#5F7052" transform="rotate(-44.53 59.74 -16.10)"/><ellipse cx="72.35" cy="-5.78" rx="7.00" ry="2.94" fill="#5F7052" transform="rotate(43.55 72.35 -5.78)"/><ellipse cx="85.43" cy="-13.33" rx="6.00" ry="2.52" fill="#5F7052" transform="rotate(-36.45 85.43 -13.33)"/><ellipse cx="101.40" cy="-6.77" rx="7.50" ry="3.00" fill="#5F7052" transform="rotate(9.46 101.40 -6.77)"/></g></defs>
+<g transform="translate(230.0,66) scale(1.0)"><use href="#sprig"/><use href="#sprig" transform="scale(-1,1)"/><rect x="-3.6" y="-3.6" width="7.2" height="7.2" fill="#5F7052" transform="rotate(45)"/></g>
+<text x="230.0" y="158" text-anchor="middle" font-family="'Cormorant Garamond', 'EB Garamond', Georgia, 'Times New Roman', serif" font-size="25" letter-spacing="9" fill="#5F7052">LET&#39;S GET</text>
+<text x="230.0" y="228" text-anchor="middle" font-family="'Cormorant Garamond', 'EB Garamond', Georgia, 'Times New Roman', serif" font-style="italic" font-size="68" fill="#5F7052">Married</text>
+<g stroke="#8A9A75" stroke-width="1">
+  <line x1="150" y1="262" x2="212" y2="262"/>
+  <line x1="248" y1="262" x2="310" y2="262"/>
+</g>
+<rect x="226.8" y="258.8" width="6.4" height="6.4" fill="#8A9A75" transform="rotate(45 230 262)"/>
+</svg>

@@ -12,8 +12,15 @@ export default function PainelLayout({
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
           <nav className="flex items-center gap-5 text-sm">
-            <Link href="/painel" className="font-serif text-lg text-foreground">
-              letsgetmarried
+            <Link href="/painel" aria-label="letsgetmarried — painel">
+              {/* eslint-disable-next-line @next/next/no-img-element -- logo SVG estático, sem otimização do next/image */}
+              <img
+                src="/logo-horizontal.svg"
+                alt="letsgetmarried"
+                width={150}
+                height={33}
+                className="h-7 w-auto"
+              />
             </Link>
             <Link href="/painel/editar" className="text-muted transition hover:text-accent">
               Editar site
