@@ -316,7 +316,7 @@ function GiftGroup({
           return (
             <div
               key={g.id}
-              className={`overflow-hidden rounded-xl border p-5 text-center transition ${claimed ? "opacity-70" : ""}`}
+              className={`flex h-full flex-col overflow-hidden rounded-xl border p-5 text-center transition ${claimed ? "opacity-70" : ""}`}
               style={{ borderColor: "var(--ink-soft)", background: "color-mix(in srgb, var(--on-ink) 4%, transparent)" }}
             >
               {g.image_url && (
@@ -326,13 +326,15 @@ function GiftGroup({
               <h4 className="font-serif text-xl text-[var(--on-ink)]">{g.title}</h4>
               {g.description && <p className="mt-1 text-sm text-[var(--on-ink-soft)]">{g.description}</p>}
               <p className="mt-1 mb-4 text-[var(--ink-accent)]">{brl(g.suggested_amount)}</p>
-              <GiftActions
-                giftId={g.id}
-                slug={slug}
-                payload={pixFor(g.suggested_amount)}
-                isHoneymoon={g.is_honeymoon_fund}
-                initialClaimed={claimed}
-              />
+              <div className="mt-auto">
+                <GiftActions
+                  giftId={g.id}
+                  slug={slug}
+                  payload={pixFor(g.suggested_amount)}
+                  isHoneymoon={g.is_honeymoon_fund}
+                  initialClaimed={claimed}
+                />
+              </div>
             </div>
           );
         })}
