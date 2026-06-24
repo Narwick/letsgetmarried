@@ -6,8 +6,6 @@
  */
 
 const BASE_URL = "https://api.abacatepay.com/v2";
-// Cupons ainda vivem na API v1 (POST /v1/coupon/create).
-const V1_BASE_URL = "https://api.abacatepay.com/v1";
 
 interface CreateCheckoutParams {
   productId: string;
@@ -64,11 +62,12 @@ interface CreateCouponParams {
 }
 
 /**
- * Cria um cupom de desconto percentual na AbacatePay. É isso que faz o desconto
- * valer no checkout (passamos o código em `coupons`). Lança em caso de erro.
+ * Cria um cupom de desconto percentual na AbacatePay (v2: POST /coupons/create).
+ * É isso que faz o desconto valer no checkout (passamos o código em `coupons`).
+ * Lança em caso de erro.
  */
 export async function createCoupon(p: CreateCouponParams): Promise<{ code: string }> {
-  const res = await fetch(`${V1_BASE_URL}/coupon/create`, {
+  const res = await fetch(`${BASE_URL}/coupons/create`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey()}`,
