@@ -75,7 +75,8 @@ export async function createCoupon(p: CreateCouponParams): Promise<{ code: strin
     },
     body: JSON.stringify({
       code: p.code,
-      discount: p.discountPercent,
+      // PERCENTAGE na AbacatePay é em centésimos de % (basis points): 9000 = 90%.
+      discount: Math.round(p.discountPercent * 100),
       discountKind: "PERCENTAGE",
       maxRedeems: p.maxRedeems ?? -1,
       notes: p.notes ?? "",
