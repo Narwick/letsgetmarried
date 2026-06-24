@@ -25,6 +25,7 @@ export function GiftActions({
 }) {
   const router = useRouter();
   const [claimed, setClaimed] = useState(initialClaimed);
+  const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,12 +55,34 @@ export function GiftActions({
     router.refresh();
   }
 
+  // Card fechado: só o botão para revelar o PIX/QR. (Se não há payload PIX,
+  // cai direto no fluxo de "já presenteei".)
+  if (payload && !open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="block w-full rounded-full bg-[var(--ink-accent)] px-4 py-2.5 text-sm font-medium text-[var(--ink)] transition hover:opacity-90"
+      >
+        Presentear via PIX
+      </button>
+    );
+  }
+
   return (
     <div className="space-y-3">
       {payload && (
-        <div className="rounded-lg bg-white p-4">
-          <PixCard payload={payload} size={160} />
-        </div>
+        <>
+          <div className="rounded-lg bg-white p-4">
+            <PixCard payload={payload} size={160} />
+          </div>
+          <button
+            onClick={() => setOpen(false)}
+            className="block w-full text-center text-xs underline transition hover:text-[var(--ink-accent)]"
+            style={{ color: "var(--on-ink-soft)" }}
+          >
+            Ocultar PIX
+          </button>
+        </>
       )}
 
       {!isHoneymoon &&
