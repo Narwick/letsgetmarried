@@ -3,6 +3,7 @@
 import { useActionState, useRef, useState } from "react";
 import { addGift } from "@/app/painel/actions";
 import { createClient } from "@/lib/supabase/client";
+import { CurrencyInput } from "@/components/painel/CurrencyInput";
 
 type State = { ok?: boolean; error?: string } | null;
 
@@ -18,6 +19,7 @@ export function AddGiftForm({ weddingId }: { weddingId: string }) {
   const [state, formAction, pending] = useActionState<State, FormData>(action, null);
   const ref = useRef<HTMLFormElement>(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [amountCents, setAmountCents] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
   const [imgError, setImgError] = useState<string | null>(null);
 
@@ -59,11 +61,17 @@ export function AddGiftForm({ weddingId }: { weddingId: string }) {
         await formAction(fd);
         ref.current?.reset();
         setImageUrl("");
+        setAmountCents(null);
       }}
       className="space-y-4 rounded-2xl border border-border bg-surface p-5"
     >
       <input type="hidden" name="wedding_id" value={weddingId} />
       <input type="hidden" name="image_url" value={imageUrl} />
+      <input
+        type="hidden"
+        name="suggested_amount"
+        value={amountCents != null ? (amountCents / 100).toString() : ""}
+      />
       <h2 className="font-serif text-xl text-foreground">Adicionar presente</h2>
 
       <div className="flex items-center gap-4">
@@ -91,7 +99,8 @@ export function AddGiftForm({ weddingId }: { weddingId: string }) {
         </div>
         <div>
           <label className="block text-sm font-medium text-foreground">Valor sugerido (R$)</label>
-          <input name="suggested_amount" type="number" step="0.01" min="0" className={inputCls} placeholder="deixe em branco p/ valor livre" />
+          <CurrencyInput valueCents={amountCents} onChange={setAmountCents} className={inputCls} />
+          <p className="mt-1 text-xs text-muted">Deixe em branco para valor livre.</p>
         </div>
       </div>
       <div>

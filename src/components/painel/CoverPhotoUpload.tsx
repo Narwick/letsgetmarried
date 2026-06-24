@@ -1,21 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { saveCoverPhoto } from "@/app/painel/actions";
+import { saveCoverPhoto, saveCoverPosition } from "@/app/painel/actions";
 
 const BUCKET = "wedding-photos";
+
+const clamp = (n: number) => Math.min(100, Math.max(0, Math.round(n)));
+
+function parsePos(p: string | null): { x: number; y: number } {
+  const m = (p ?? "").match(/^(\d{1,3})% (\d{1,3})%$/);
+  if (m) return { x: clamp(+m[1]), y: clamp(+m[2]) };
+  return { x: 50, y: 50 };
+}
+
+const PRESETS: { label: string; value: string }[] = [
+  { label: "Topo", value: "50% 0%" },
+  { label: "Centro", value: "50% 50%" },
+  { label: "Base", value: "50% 100%" },
+];
 
 export function CoverPhotoUpload({
   weddingId,
   initialUrl,
+  initialPosition,
 }: {
   weddingId: string;
   initialUrl: string | null;
+  initialPosition: string | null;
 }) {
   const [url, setUrl] = useState<string | null>(initialUrl);
+  const [position, setPosition] = useState<string>(initialPosition || "center");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [posSaved, setPosSaved] = useState(false);
+
+  const boxRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -67,16 +88,97 @@ export function CoverPhotoUpload({
     setUploading(false);
   }
 
+  async function persistPosition(p: string) {
+    setPosSaved(false);
+    await saveCoverPosition(weddingId, p);
+    setPosSaved(true);
+    setTimeout(() => setPosSaved(false), 1500);
+  }
+
+  /** Atualiza a posição a partir das coordenadas do ponteiro e devolve o valor. */
+  function moveTo(clientX: number, clientY: number): string {
+    const el = boxRef.current;
+    if (!el) return position;
+    const r = el.getBoundingClientRect();
+    const x = clamp(((clientX - r.left) / r.width) * 100);
+    const y = clamp(((clientY - r.top) / r.height) * 100);
+    const p = `${x}% ${y}%`;
+    setPosition(p);
+    return p;
+  }
+
+  function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    dragging.current = true;
+    boxRef.current?.setPointerCapture(e.pointerId);
+    moveTo(e.clientX, e.clientY);
+  }
+  function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (!dragging.current) return;
+    moveTo(e.clientX, e.clientY);
+  }
+  function onPointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    if (!dragging.current) return;
+    dragging.current = false;
+    boxRef.current?.releasePointerCapture(e.pointerId);
+    persistPosition(moveTo(e.clientX, e.clientY));
+  }
+
+  function choosePreset(value: string) {
+    setPosition(value);
+    persistPosition(value);
+  }
+
+  const marker = parsePos(position);
+
   return (
     <div className="space-y-3">
       {url ? (
-        <div className="relative overflow-hidden rounded-xl border border-stone-200">
+        <div
+          ref={boxRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          className="relative h-48 w-full cursor-grab touch-none select-none overflow-hidden rounded-xl border border-stone-200 active:cursor-grabbing"
+          title="Arraste para escolher o ponto de foco da imagem"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={url} alt="Foto de capa" className="h-48 w-full object-cover" />
+          <img
+            src={url}
+            alt="Foto de capa"
+            draggable={false}
+            className="pointer-events-none h-full w-full object-cover"
+            style={{ objectPosition: position }}
+          />
+          {/* Marcador do ponto de foco */}
+          <span
+            className="pointer-events-none absolute h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_0_0_2px_rgba(0,0,0,.35)]"
+            style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
+          />
         </div>
       ) : (
         <div className="flex h-48 items-center justify-center rounded-xl border-2 border-dashed border-stone-300 bg-stone-50 text-sm text-stone-400">
           Nenhuma foto de capa
+        </div>
+      )}
+
+      {url && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-stone-500">Ponto de foco:</span>
+          {PRESETS.map((p) => (
+            <button
+              key={p.value}
+              type="button"
+              onClick={() => choosePreset(p.value)}
+              className={`rounded-full border px-3 py-1 text-xs transition ${
+                position === p.value
+                  ? "border-accent bg-accent-soft text-accent-hover"
+                  : "border-stone-300 text-stone-600 hover:border-accent"
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+          {posSaved && <span className="text-xs text-green-700">Posição salva!</span>}
         </div>
       )}
 
@@ -103,7 +205,10 @@ export function CoverPhotoUpload({
         )}
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <p className="text-xs text-stone-500">Recomendado: imagem horizontal, até 5 MB.</p>
+      <p className="text-xs text-stone-500">
+        Recomendado: imagem horizontal, até 5 MB. Arraste sobre a imagem para escolher o
+        enquadramento que aparece no site.
+      </p>
     </div>
   );
 }

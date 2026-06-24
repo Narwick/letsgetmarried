@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { saveSchedule } from "@/app/painel/actions";
+import { maskTime } from "@/lib/masks";
 import type { ScheduleEntry } from "@/lib/types";
 
 const inputCls =
@@ -41,7 +42,8 @@ export function ScheduleEditor({
         <div key={i} className="grid grid-cols-[110px_1fr_auto] items-center gap-2">
           <input
             value={row.hora}
-            onChange={(e) => update(i, "hora", e.target.value)}
+            onChange={(e) => update(i, "hora", maskTime(e.target.value))}
+            inputMode="numeric"
             className={inputCls}
             placeholder="16h00"
           />

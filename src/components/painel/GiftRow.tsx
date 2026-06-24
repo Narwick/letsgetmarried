@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { updateGift, deleteGift } from "@/app/painel/actions";
 import { uploadImage } from "@/lib/uploadImage";
+import { CurrencyInput } from "@/components/painel/CurrencyInput";
 import type { Gift } from "@/lib/types";
 
 const inputCls =
@@ -18,9 +19,7 @@ export function GiftRow({ gift, weddingId }: { gift: Gift; weddingId: string }) 
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(gift.title);
   const [description, setDescription] = useState(gift.description ?? "");
-  const [amount, setAmount] = useState(
-    gift.suggested_amount != null ? (gift.suggested_amount / 100).toString() : "",
-  );
+  const [amountCents, setAmountCents] = useState<number | null>(gift.suggested_amount);
   const [honeymoon, setHoneymoon] = useState(gift.is_honeymoon_fund);
   const [imageUrl, setImageUrl] = useState(gift.image_url ?? "");
   const [uploading, setUploading] = useState(false);
@@ -46,7 +45,7 @@ export function GiftRow({ gift, weddingId }: { gift: Gift; weddingId: string }) 
     fd.set("title", title);
     fd.set("description", description);
     fd.set("image_url", imageUrl);
-    fd.set("suggested_amount", amount);
+    fd.set("suggested_amount", amountCents != null ? (amountCents / 100).toString() : "");
     if (honeymoon) fd.set("is_honeymoon_fund", "on");
     startTransition(async () => {
       const res = await updateGift(fd);
@@ -119,15 +118,8 @@ export function GiftRow({ gift, weddingId }: { gift: Gift; weddingId: string }) 
         </div>
         <div>
           <label className="block text-sm font-medium text-foreground">Valor sugerido (R$)</label>
-          <input
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            type="number"
-            step="0.01"
-            min="0"
-            className={inputCls}
-            placeholder="vazio = valor livre"
-          />
+          <CurrencyInput valueCents={amountCents} onChange={setAmountCents} className={inputCls} />
+          <p className="mt-1 text-xs text-muted">Vazio = valor livre.</p>
         </div>
       </div>
       <div>

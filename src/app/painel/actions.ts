@@ -96,6 +96,29 @@ export async function saveCoverPhoto(weddingId: string, url: string | null) {
   return { ok: true };
 }
 
+/** Salva o posicionamento (focal point) da foto de capa. Ex.: "50% 30%". */
+export async function saveCoverPosition(weddingId: string, position: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  // Sanitiza: aceita só "Nx% Ny%" (0–100). Cai para "center" se vier algo estranho.
+  const safe = /^\d{1,3}% \d{1,3}%$/.test(position) ? position : "center";
+
+  const { error } = await supabase
+    .from("weddings")
+    .update({ cover_position: safe })
+    .eq("id", weddingId)
+    .eq("owner_id", user.id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/painel/editar");
+  await revalidateSite(supabase, weddingId);
+  return { ok: true };
+}
+
 /** Salva a timeline da história (array completo). */
 export async function saveTimeline(weddingId: string, entries: TimelineEntry[]) {
   const supabase = await createClient();
@@ -105,12 +128,16 @@ export async function saveTimeline(weddingId: string, entries: TimelineEntry[]) 
   if (!user) redirect("/login");
 
   const clean = entries
-    .map((e) => ({
-      ano: (e.ano ?? "").trim(),
-      titulo: (e.titulo ?? "").trim(),
-      texto: (e.texto ?? "").trim(),
-    }))
-    .filter((e) => e.ano || e.titulo || e.texto);
+    .map((e) => {
+      const base = {
+        ano: (e.ano ?? "").trim(),
+        titulo: (e.titulo ?? "").trim(),
+        texto: (e.texto ?? "").trim(),
+      };
+      const imagem = (e.imagem ?? "").trim();
+      return imagem ? { ...base, imagem } : base;
+    })
+    .filter((e) => e.ano || e.titulo || e.texto || ("imagem" in e && e.imagem));
 
   const { error } = await supabase
     .from("weddings")

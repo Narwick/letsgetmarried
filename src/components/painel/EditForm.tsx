@@ -2,7 +2,13 @@
 
 import { useActionState } from "react";
 import { saveWedding } from "@/app/painel/actions";
+import { maskTime } from "@/lib/masks";
 import type { Wedding } from "@/lib/types";
+
+/** Aplica a máscara de horário num input não-controlado (mantém o cursor utilizável). */
+function onTimeInput(e: React.FormEvent<HTMLInputElement>) {
+  e.currentTarget.value = maskTime(e.currentTarget.value);
+}
 
 type State = { ok?: boolean; error?: string } | null;
 
@@ -69,7 +75,7 @@ export function EditForm({ wedding }: { wedding: Wedding }) {
           </div>
           <div>
             <label className={labelCls}>Horário</label>
-            <input name="ceremony_horario" defaultValue={wedding.ceremony?.horario ?? ""} className={inputCls} placeholder="16h00" />
+            <input name="ceremony_horario" defaultValue={wedding.ceremony?.horario ?? ""} onInput={onTimeInput} inputMode="numeric" className={inputCls} placeholder="16h00" />
           </div>
           <div className="sm:col-span-2">
             <label className={labelCls}>Endereço</label>
@@ -95,7 +101,7 @@ export function EditForm({ wedding }: { wedding: Wedding }) {
           </div>
           <div>
             <label className={labelCls}>Horário</label>
-            <input name="reception_horario" defaultValue={wedding.reception?.horario ?? ""} className={inputCls} placeholder="18h00" />
+            <input name="reception_horario" defaultValue={wedding.reception?.horario ?? ""} onInput={onTimeInput} inputMode="numeric" className={inputCls} placeholder="18h00" />
           </div>
           <div className="sm:col-span-2">
             <label className={labelCls}>Endereço</label>

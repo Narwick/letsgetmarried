@@ -6,6 +6,7 @@ export interface TimelineEntry {
   ano: string;
   titulo: string;
   texto: string;
+  imagem?: string; // URL da foto do capítulo (opcional)
 }
 
 export interface ScheduleEntry {
@@ -30,6 +31,7 @@ export interface Wedding {
   event_location: string | null;
   event_details: string | null;
   cover_photo_url: string | null;
+  cover_position: string | null; // object-position do hero, ex: "50% 30%"
   theme: string;
   custom_accent: string | null;
   pix_key: string | null;

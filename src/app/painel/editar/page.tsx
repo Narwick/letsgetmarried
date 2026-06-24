@@ -29,7 +29,11 @@ export default async function EditarPage() {
 
       <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">
         <h2 className="font-serif text-xl text-foreground">Foto de capa</h2>
-        <CoverPhotoUpload weddingId={wedding.id} initialUrl={wedding.cover_photo_url} />
+        <CoverPhotoUpload
+          weddingId={wedding.id}
+          initialUrl={wedding.cover_photo_url}
+          initialPosition={wedding.cover_position}
+        />
       </section>
 
       <section className="space-y-4 rounded-2xl border border-border bg-surface p-5">

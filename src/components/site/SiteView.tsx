@@ -89,7 +89,11 @@ export function SiteView({
         className="relative flex min-h-[88vh] flex-col items-center justify-center px-6 py-20 text-center"
         style={
           wedding.cover_photo_url
-            ? { backgroundImage: `url(${wedding.cover_photo_url})`, backgroundSize: "cover", backgroundPosition: "center" }
+            ? {
+                backgroundImage: `url(${wedding.cover_photo_url})`,
+                backgroundSize: "cover",
+                backgroundPosition: wedding.cover_position || "center",
+              }
             : inkBg
         }
       >
@@ -139,6 +143,14 @@ export function SiteView({
                         <span className="font-serif text-2xl italic text-accent">{h.ano}</span>
                         {h.titulo && <h3 className="mt-1 font-serif text-2xl text-foreground">{h.titulo}</h3>}
                         {h.texto && <p className="mt-2 leading-relaxed text-muted">{h.texto}</p>}
+                        {h.imagem && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={h.imagem}
+                            alt={h.titulo || h.ano || "Foto"}
+                            className={`mt-4 block h-44 w-full max-w-xs rounded-xl object-cover shadow-sm ${left ? "sm:ml-auto" : "sm:mr-auto"}`}
+                          />
+                        )}
                       </div>
                     </div>
                   );
