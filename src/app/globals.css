@@ -47,3 +47,263 @@ input::placeholder,
 textarea::placeholder {
   color: #a8a29e;
 }
+
+/* ── Portão de entrada: envelope de convite ───────────────────────────────
+   Overlay que cobre o site até o convidado abrir o convite. As cores vêm das
+   variáveis do tema (herdadas do wrapper do SiteView). Animação em CSS puro. */
+.gate-overlay {
+  overflow: hidden;
+}
+.gate-overlay[data-phase="opening"] {
+  animation: gate-out 700ms ease-in 1000ms forwards;
+}
+
+.env-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.envelope {
+  position: relative;
+  width: min(86vw, 360px);
+  height: min(56vw, 236px);
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  perspective: 1200px;
+  transition: transform 300ms ease;
+}
+.envelope[data-phase="closed"]:hover {
+  transform: translateY(-4px);
+}
+
+/* Carta que sobe de dentro do envelope */
+.env-letter {
+  position: absolute;
+  top: 12%;
+  left: 10%;
+  right: 10%;
+  bottom: 8%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.6rem 1rem 0;
+  border-radius: 6px 6px 4px 4px;
+  background: var(--surface);
+  box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+.env-letter[data-phase="opening"] {
+  animation: letter-rise 1000ms cubic-bezier(0.2, 0.8, 0.2, 1) 450ms forwards;
+}
+.env-letter-kicker {
+  font-size: 0.56rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.env-letter-names {
+  font-family: var(--font-display), serif;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  color: var(--foreground);
+}
+.env-letter-date {
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Frente do envelope */
+.env-face {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 1.25rem 1.4rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--surface) 88%, var(--accent-soft)),
+    var(--accent-soft)
+  );
+  box-shadow:
+    0 40px 70px -30px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+/* Costura em V do bolso frontal (a metade de cima fica sob a aba) */
+.env-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom right,
+      transparent calc(50% - 0.5px),
+      rgba(0, 0, 0, 0.07) 50%,
+      transparent calc(50% + 0.5px)
+    ),
+    linear-gradient(
+      to bottom left,
+      transparent calc(50% - 0.5px),
+      rgba(0, 0, 0, 0.07) 50%,
+      transparent calc(50% + 0.5px)
+    );
+  pointer-events: none;
+}
+.env-face-names {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display), serif;
+  font-size: 1.25rem;
+  color: var(--foreground);
+}
+.env-face-date {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.35rem;
+  font-size: 0.56rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.env-cta {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.85rem;
+  display: inline-block;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.5rem 1.4rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* Aba superior (triângulo que abre) */
+.env-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58%;
+  z-index: 3;
+  transform-origin: top center;
+  transform: rotateX(0deg);
+  backface-visibility: hidden;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  background: linear-gradient(
+    150deg,
+    var(--accent-soft),
+    color-mix(in srgb, var(--accent) 30%, var(--surface))
+  );
+  box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.35);
+}
+.env-flap[data-phase="opening"] {
+  animation: flap-open 800ms cubic-bezier(0.35, 0.15, 0.2, 1) 150ms forwards;
+}
+
+/* Selo de cera com o monograma */
+.env-seal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--ink) 80%, #fff), var(--ink));
+  box-shadow:
+    0 4px 10px -3px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 2px var(--ink-accent);
+}
+.env-seal[data-phase="opening"] {
+  animation: seal-break 450ms ease forwards;
+}
+
+/* Dica abaixo do envelope */
+.gate-hint {
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--on-ink-soft);
+  animation: hint-pulse 2.4s ease-in-out infinite;
+}
+.gate-hint[data-phase="opening"] {
+  animation: gate-out 300ms ease forwards;
+}
+
+@keyframes flap-open {
+  to {
+    transform: rotateX(178deg);
+  }
+}
+@keyframes seal-break {
+  to {
+    transform: translate(-50%, -140%) scale(1.1);
+    opacity: 0;
+  }
+}
+@keyframes letter-rise {
+  0% {
+    transform: translateY(0) scale(0.97);
+  }
+  10% {
+    z-index: 6;
+  }
+  100% {
+    transform: translateY(-62%) scale(1);
+    z-index: 6;
+  }
+}
+@keyframes gate-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes hint-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Respeita quem prefere menos movimento: apenas um fade curto. */
+@media (prefers-reduced-motion: reduce) {
+  .envelope[data-phase="closed"]:hover {
+    transform: none;
+  }
+  .env-flap[data-phase="opening"],
+  .env-letter[data-phase="opening"],
+  .env-seal[data-phase="opening"] {
+    animation: none;
+  }
+  .gate-overlay[data-phase="opening"] {
+    animation: gate-out 250ms ease forwards;
+  }
+  .gate-hint {
+    animation: none;
+    opacity: 0.7;
+  }
+}

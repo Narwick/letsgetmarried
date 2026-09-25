@@ -3,6 +3,7 @@ import { themeStyle } from "@/lib/themes";
 import { GiftActions } from "@/components/site/GiftActions";
 import { Countdown } from "@/components/site/Countdown";
 import { Crest } from "@/components/site/Crest";
+import { InvitationGate } from "@/components/site/InvitationGate";
 import { RsvpForm } from "@/components/site/RsvpForm";
 import type { Gift, Rsvp, Wedding } from "@/lib/types";
 
@@ -62,6 +63,18 @@ export function SiteView({
 
   return (
     <div className="scroll-smooth bg-background text-foreground" style={themeStyle(wedding.theme, wedding.custom_accent)}>
+      <InvitationGate
+        coupleNames={wedding.couple_names ?? "Nosso Casamento"}
+        dateLabel={
+          eventDate
+            ? eventDate.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })
+            : null
+        }
+        locationLabel={wedding.event_location ?? null}
+        mLeft={mLeft}
+        mRight={mRight}
+      />
+
       {isPreview && (
         <div className="bg-amber-500 px-4 py-2 text-center text-sm font-medium text-white">
           Pré-visualização (rascunho) — só você vê esta página. Publique no painel para deixá-la pública.
