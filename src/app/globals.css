@@ -48,203 +48,232 @@ textarea::placeholder {
   color: #a8a29e;
 }
 
-/* ── Portão de entrada: envelope de convite ───────────────────────────────
-   Overlay que cobre o site até o convidado abrir o convite. As cores vêm das
-   variáveis do tema (herdadas do wrapper do SiteView). Animação em CSS puro. */
+/* ── Portão de entrada: envelope de convite (premium) ─────────────────────
+   Overlay sobre o site com um envelope elegante nas cores do tema. Sem texto
+   com o envelope fechado: o monograma e os nomes surgem só ao abrir. As cores
+   vêm das variáveis do tema (herdadas do wrapper do SiteView). Animação em
+   CSS puro. */
 .gate-overlay {
   overflow: hidden;
 }
+/* Vinheta para dar profundidade ao fundo escuro. */
+.gate-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 42%, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+}
 .gate-overlay[data-phase="opening"] {
-  animation: gate-out 700ms ease-in 1000ms forwards;
+  animation: gate-out 800ms ease-in 1800ms forwards;
+}
+
+/* Moldura dourada com ornamentos de filigrana nos cantos. */
+.gate-frame {
+  position: absolute;
+  inset: clamp(14px, 4vw, 34px);
+  border: 1px solid color-mix(in srgb, var(--ink-accent) 45%, transparent);
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--ink-accent) 12%, transparent);
+  pointer-events: none;
+}
+.gate-corner {
+  position: absolute;
+}
+.gate-corner--tl {
+  top: -2px;
+  left: -2px;
+}
+.gate-corner--tr {
+  top: -2px;
+  right: -2px;
+  transform: scaleX(-1);
+}
+.gate-corner--bl {
+  bottom: -2px;
+  left: -2px;
+  transform: scaleY(-1);
+}
+.gate-corner--br {
+  bottom: -2px;
+  right: -2px;
+  transform: scale(-1, -1);
+}
+
+/* Partículas de brilho no fundo. */
+.gate-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.gate-spark {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--ink-accent);
+  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--ink-accent) 70%, transparent);
+  opacity: 0.25;
+  animation: spark-twinkle 3.4s ease-in-out infinite;
+}
+.gate-sparkles[data-phase="opening"] .gate-spark {
+  animation: spark-burst 1.4s ease-out forwards;
 }
 
 .env-scene {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.6rem;
 }
 
+/* Conteúdo revelado ao abrir (brilho + monograma + nomes). */
+.env-reveal {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  transform: translate(-50%, -46%) scale(0.7);
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+}
+.env-reveal[data-phase="opening"] {
+  animation: reveal-in 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 650ms forwards;
+}
+.env-glow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--ink-accent) 55%, transparent) 0%,
+    transparent 62%
+  );
+  filter: blur(6px);
+  z-index: -1;
+}
+.env-reveal-names {
+  font-family: var(--font-display), serif;
+  font-size: 1.9rem;
+  line-height: 1.1;
+  color: var(--on-ink);
+}
+.env-reveal-date {
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-accent);
+}
+
+/* Envelope. */
 .envelope {
   position: relative;
-  width: min(86vw, 360px);
-  height: min(56vw, 236px);
+  width: min(80vw, 340px);
+  height: min(52vw, 224px);
   appearance: none;
   border: none;
   background: transparent;
   padding: 0;
   cursor: pointer;
-  perspective: 1200px;
-  transition: transform 300ms ease;
+  perspective: 1300px;
+  transition: transform 350ms ease;
 }
 .envelope[data-phase="closed"]:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
 }
 
-/* Carta que sobe de dentro do envelope */
-.env-letter {
-  position: absolute;
-  top: 12%;
-  left: 10%;
-  right: 10%;
-  bottom: 8%;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1.6rem 1rem 0;
-  border-radius: 6px 6px 4px 4px;
-  background: var(--surface);
-  box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.45);
-  text-align: center;
-}
-.env-letter[data-phase="opening"] {
-  animation: letter-rise 1000ms cubic-bezier(0.2, 0.8, 0.2, 1) 450ms forwards;
-}
-.env-letter-kicker {
-  font-size: 0.56rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-.env-letter-names {
-  font-family: var(--font-display), serif;
-  font-size: 1.6rem;
-  line-height: 1.1;
-  color: var(--foreground);
-}
-.env-letter-date {
-  font-size: 0.58rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-/* Frente do envelope */
 .env-face {
   position: absolute;
   inset: 0;
   z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0 1.25rem 1.4rem;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   background: linear-gradient(
     150deg,
-    color-mix(in srgb, var(--surface) 88%, var(--accent-soft)),
-    var(--accent-soft)
+    color-mix(in srgb, var(--surface) 90%, var(--accent-soft)),
+    color-mix(in srgb, var(--accent-soft) 88%, var(--accent))
   );
   box-shadow:
-    0 40px 70px -30px rgba(0, 0, 0, 0.65),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+    0 46px 80px -34px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px color-mix(in srgb, var(--ink-accent) 40%, transparent),
+    inset 0 0 40px rgba(0, 0, 0, 0.06);
 }
-/* Costura em V do bolso frontal (a metade de cima fica sob a aba) */
-.env-face::after {
-  content: "";
+.env-damask,
+.env-seams {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(
-      to bottom right,
-      transparent calc(50% - 0.5px),
-      rgba(0, 0, 0, 0.07) 50%,
-      transparent calc(50% + 0.5px)
-    ),
-    linear-gradient(
-      to bottom left,
-      transparent calc(50% - 0.5px),
-      rgba(0, 0, 0, 0.07) 50%,
-      transparent calc(50% + 0.5px)
-    );
-  pointer-events: none;
-}
-.env-face-names {
-  position: relative;
-  z-index: 1;
-  font-family: var(--font-display), serif;
-  font-size: 1.25rem;
-  color: var(--foreground);
-}
-.env-face-date {
-  position: relative;
-  z-index: 1;
-  margin-top: 0.35rem;
-  font-size: 0.56rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.env-cta {
-  position: relative;
-  z-index: 1;
-  margin-top: 0.85rem;
-  display: inline-block;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  padding: 0.5rem 1.4rem;
-  font-size: 0.6rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  width: 100%;
+  height: 100%;
 }
 
-/* Aba superior (triângulo que abre) */
+/* Aba superior (triângulo que abre). */
 .env-flap {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 58%;
+  height: 60%;
   z-index: 3;
   transform-origin: top center;
   transform: rotateX(0deg);
   backface-visibility: hidden;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   background: linear-gradient(
-    150deg,
-    var(--accent-soft),
-    color-mix(in srgb, var(--accent) 30%, var(--surface))
+    155deg,
+    color-mix(in srgb, var(--accent-soft) 92%, #fff),
+    color-mix(in srgb, var(--accent-soft) 80%, var(--accent))
   );
-  box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.4);
+}
+.env-flap-edge {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 .env-flap[data-phase="opening"] {
-  animation: flap-open 800ms cubic-bezier(0.35, 0.15, 0.2, 1) 150ms forwards;
+  animation: flap-open 900ms cubic-bezier(0.35, 0.12, 0.2, 1) 200ms forwards;
 }
 
-/* Selo de cera com o monograma */
+/* Selo de cera com o monograma. */
 .env-seal {
   position: absolute;
-  top: 50%;
+  top: 52%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 4;
-  width: 64px;
-  height: 64px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--ink) 80%, #fff), var(--ink));
+  background: radial-gradient(circle at 34% 28%, color-mix(in srgb, var(--ink) 62%, #fff), var(--ink) 70%);
   box-shadow:
-    0 4px 10px -3px rgba(0, 0, 0, 0.5),
-    inset 0 0 0 2px var(--ink-accent);
+    0 6px 14px -4px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 2px var(--ink-accent),
+    inset 0 -6px 12px rgba(0, 0, 0, 0.45),
+    inset 0 6px 10px color-mix(in srgb, #fff 22%, transparent);
 }
 .env-seal[data-phase="opening"] {
-  animation: seal-break 450ms ease forwards;
+  animation: seal-break 500ms ease 100ms forwards;
 }
 
-/* Dica abaixo do envelope */
+/* Ícone de toque (sem palavras com o envelope fechado). */
 .gate-hint {
-  font-size: 0.62rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--on-ink-soft);
-  animation: hint-pulse 2.4s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gate-tap {
+  animation: tap-pulse 1.8s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--ink-accent) 50%, transparent));
 }
 .gate-hint[data-phase="opening"] {
   animation: gate-out 300ms ease forwards;
@@ -252,25 +281,23 @@ textarea::placeholder {
 
 @keyframes flap-open {
   to {
-    transform: rotateX(178deg);
+    transform: rotateX(176deg);
   }
 }
 @keyframes seal-break {
   to {
-    transform: translate(-50%, -140%) scale(1.1);
+    transform: translate(-50%, -160%) scale(1.15) rotate(-8deg);
     opacity: 0;
   }
 }
-@keyframes letter-rise {
+@keyframes reveal-in {
   0% {
-    transform: translateY(0) scale(0.97);
-  }
-  10% {
-    z-index: 6;
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.7);
   }
   100% {
-    transform: translateY(-62%) scale(1);
-    z-index: 6;
+    opacity: 1;
+    transform: translate(-50%, -62%) scale(1);
   }
 }
 @keyframes gate-out {
@@ -279,12 +306,35 @@ textarea::placeholder {
     visibility: hidden;
   }
 }
-@keyframes hint-pulse {
+@keyframes spark-twinkle {
   0%,
   100% {
-    opacity: 0.5;
+    opacity: 0.12;
+    transform: scale(0.8);
   }
   50% {
+    opacity: 0.55;
+    transform: scale(1.15);
+  }
+}
+@keyframes spark-burst {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+@keyframes tap-pulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-4px);
     opacity: 1;
   }
 }
@@ -294,16 +344,20 @@ textarea::placeholder {
   .envelope[data-phase="closed"]:hover {
     transform: none;
   }
+  .gate-spark,
+  .gate-tap {
+    animation: none;
+  }
   .env-flap[data-phase="opening"],
-  .env-letter[data-phase="opening"],
   .env-seal[data-phase="opening"] {
     animation: none;
   }
-  .gate-overlay[data-phase="opening"] {
-    animation: gate-out 250ms ease forwards;
-  }
-  .gate-hint {
+  .env-reveal[data-phase="opening"] {
     animation: none;
-    opacity: 0.7;
+    opacity: 1;
+    transform: translate(-50%, -60%) scale(1);
+  }
+  .gate-overlay[data-phase="opening"] {
+    animation: gate-out 300ms ease forwards;
   }
 }
